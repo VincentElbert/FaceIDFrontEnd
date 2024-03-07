@@ -1,8 +1,8 @@
 # app.py
 
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
-from camera import capture_and_upload_frames
+# from camera import capture_and_upload_frames
 
 app = Flask(__name__)
 
@@ -44,13 +44,48 @@ def login():
 
 @app.route('/faceID', methods=['GET','POST'])
 def faceID():
-    capture_and_upload_frames()
-    return redirect(url_for("home"))
+    if request.method == 'POST':
+        frames = request.json['frames']
+        # Process the received frames for face scanning
+        # Implement your face scanning logic here
+        # For demonstration purposes, let's assume authentication is successful
+        success = True
+        
+        if success:
+            message = 'Authentication successful!'
+        else:
+            message = 'Authentication failed.'
+        
+        return jsonify({'message': message})
+    
+    return render_template('faceid.html')
 
 @app.route('/logout')
 def logout():
     session.pop('username', None)
     return redirect(url_for('login'))
 
+
+
+@app.route('/register', methods=['GET'])
+def register():
+    # Render the registration page
+    return render_template('register.html')
+
+@app.route('/process_scans', methods=['POST'])
+def process_scans():
+    scans = request.json
+    # Process the scan data
+    for step, image_data in scans.items():
+        # TODO: Process each image_data, for example, save to a file or a database
+        print(f"Received scan for {step}")
+
+    # After processing the scans, return a success response
+    # You might want to implement actual success checking logic based on your processing
+    return jsonify({'success': True})
+
+# ... other route definitions ...
+
 if __name__ == '__main__':
     app.run(debug=True)
+

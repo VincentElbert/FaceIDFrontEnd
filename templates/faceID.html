@@ -1,26 +1,190 @@
-<!-- templates/index.html -->
-
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Face ID</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Face Scanning</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/webcamjs/1.0.26/webcam.min.js"></script>
+    <style>
+
+        :root {
+            border-top: 8px solid #e3b18d; /* Updated to use the orange decorative element color */
+            
+          }
+          
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f2f2f2;
+            font-family: Arial, sans-serif;
+        }
+        
+        .card {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .card-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        
+        #webcam-container {
+            margin-bottom: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+        
+        .button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        
+        .authenticate-btn {
+            background-color: #4CAF50;
+            color: white;
+            margin-right: 10px;
+        }
+        
+        .go-back-btn {
+            background-color: #ccc;
+            color: black;
+        }
+        
+        #loading {
+            display: none;
+            margin-top: 20px;
+            font-size: 18px;
+            color: #666;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+        
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 300px;
+            text-align: center;
+            border-radius: 10px;
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <h2>Please stay in the camera for Face ID</h2>
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="message">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-        <div class="footer">
-            <p>&copy; 2024 Your Company</p>
+    <div class="card">
+        <h1 class="card-title">Face Scanning Authentication</h1>
+            <div id="webcam-container">
+
+            </div>
+
+            <div>
+            <button id="authenticate-btn" class="button authenticate-btn">Authenticate</button>
+            <button id="go-back-btn" class="button go-back-btn">Go Back</button>
+            
+            </div>
+            
+            <div id="loading">Authenticating...</div>
+    </div>
+    
+    <div id="message-modal" class="modal">
+        <div class="modal-content">
+            <p id="message-text"></p>
+            <button id="close-modal" class="button">Close</button>
         </div>
     </div>
+
+    <script>
+        Webcam.set({
+            width: 320,
+            height: 240,
+            image_format: 'jpeg',
+            jpeg_quality: 90,
+            flip_horiz: true // Flip camera horizontally
+        });
+       
+        Webcam.attach('#webcam-container');
+    
+        $('#authenticate-btn').click(function() {
+            var frames = [];
+            $('#loading').show();
+            var captureFrame = function() {
+                Webcam.snap(function(data_uri) {
+                    frames.push(data_uri);
+                    if (frames.length < 30) {
+                        setTimeout(captureFrame, 100);
+                    } else {
+                        sendFrames(frames);
+                    }
+                });
+            };
+            captureFrame();
+        });
+    
+        $('#go-back-btn').click(function() {
+            // Add logic to go back to the previous page or desired location
+            window.history.back();
+        });
+    
+        function sendFrames(frames) {
+            $.ajax({
+                url: '/faceID',
+                type: 'POST',
+                data: JSON.stringify({ frames: frames }),
+                contentType: 'application/json',
+                success: function(response) {
+                    $('#loading').hide();
+                    showMessage(response.message);
+                },
+                error: function(xhr, status, error) {
+                    $('#loading').hide();
+                    console.error(error);
+                    showMessage('Authentication failed. Please try again.');
+                },
+                complete: function() {
+                    // Reattach the webcam after sending frames to ensure it's available for next time
+                    Webcam.attach('#webcam-container');
+                }
+            });
+        }
+        
+        function showMessage(message) {
+            $('#message-text').text(message);
+            $('#message-modal').css('display', 'block');
+        }
+        
+        $('#close-modal').click(function() {
+            $('#message-modal').css('display', 'none');
+            // Reattach the webcam when the modal is closed in case it was detached
+            Webcam.attach('#webcam-container');
+        });
+    </script>
 </body>
 </html>
