@@ -12,8 +12,7 @@ app.secret_key = 'your_secret_key'
 # Assuming we have a single user for demonstration purposes
 # In a real-world scenario, you would use a database
 user_info = {
-    "username": "admin",
-    "password": generate_password_hash("password123")  # Never store passwords in plain text
+    "admin" : generate_password_hash("password123")  # Never store passwords in plain text
 }
 
 @app.route('/')
@@ -34,8 +33,8 @@ def login():
         username = request.form['username']
         password = request.form['password']
 
-        if username == user_info['username'] and check_password_hash(user_info['password'], password):
-            session['username'] = user_info['username']
+        if check_password_hash(user_info[username], password):
+            session['username'] = username
             return redirect(url_for('faceID'))
         else:
             flash('Invalid username or password!')
@@ -65,25 +64,25 @@ def logout():
     session.pop('username', None)
     return redirect(url_for('login'))
 
-
-
-@app.route('/register', methods=['GET'])
+@app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        # Process the registration form data
+        data = request.json
+        email = data['email']
+        password = data['password']
+        face_images = data['faceImages']
 
-        email = request.form.get('email')
-        password = request.form.get('password')
-        confirm_password = request.form.get('confirm_password')
+        # Store the registration data in the user_info dictionary
+        user_info[email] = generate_password_hash(password)
+        if email and password and face_images:
+            # check if the face registration in register.html is successful
+            success = True
+            if success:
+                message = 'Registration successful!'
+            else:
+                message = 'Registration failed.'
 
-        if email and password and confirm_password and password == confirm_password:
-            # Perform any necessary registration logic here
-
-            # Redirect to the home page
-            return jsonify(success=True, redirect_url='/home')
-        else:
-            error_message = 'Please fill in all fields and ensure password fields match.'
-            return render_template('register.html', error_message=error_message)
+        return jsonify(message)
     else:
         return render_template('register.html')
 
