@@ -69,8 +69,23 @@ def logout():
 
 @app.route('/register', methods=['GET'])
 def register():
-    # Render the registration page
-    return render_template('register.html')
+    if request.method == 'POST':
+        # Process the registration form data
+
+        email = request.form.get('email')
+        password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
+
+        if email and password and confirm_password and password == confirm_password:
+            # Perform any necessary registration logic here
+
+            # Redirect to the home page
+            return jsonify(success=True, redirect_url='/home')
+        else:
+            error_message = 'Please fill in all fields and ensure password fields match.'
+            return render_template('register.html', error_message=error_message)
+    else:
+        return render_template('register.html')
 
 @app.route('/process_scans', methods=['POST'])
 def process_scans():

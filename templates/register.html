@@ -190,7 +190,7 @@ function transitionToNextStep() {
     nextCard.show()
     
     // Detach the webcam before transitioning to the next step
-    if (currentStep > 0) {
+    if (currentStep >= 0) {
       Webcam.reset()
     }
     
