@@ -44,20 +44,19 @@ def login():
 @app.route('/faceID', methods=['GET','POST'])
 def faceID():
     if request.method == 'POST':
-        frames = request.json['frames']
+        frames = []
+        for i in range(len(request.files)):
+            frame = request.files['frame' + str(i)]
+            frames.append(frame)
         # Process the received frames for face scanning
         # Implement your face scanning logic here
         # For demonstration purposes, let's assume authentication is successful
-        success = True
-        
-        if success:
-            message = 'Authentication successful!'
+        if frames:
+            return redirect(url_for('home'))
         else:
-            message = 'Authentication failed.'
-        
-        return jsonify({'message': message})
-    
-    return render_template('faceid.html')
+            flash('Face not recognized')
+    else:
+        return render_template('faceid.html')
 
 @app.route('/logout')
 def logout():
@@ -83,8 +82,7 @@ def register():
                 message = 'Registration failed.'
 
         return jsonify(message)
-    else:
-        return render_template('register.html')
+    return render_template('register.html')
 
 @app.route('/process_scans', methods=['POST'])
 def process_scans():

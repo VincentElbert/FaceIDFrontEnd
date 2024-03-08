@@ -113,13 +113,13 @@
             
             <div id="loading">Authenticating...</div>
     </div>
-    
-    <div id="message-modal" class="modal">
-        <div class="modal-content">
-            <p id="message-text"></p>
-            <button id="close-modal" class="button">Close</button>
-        </div>
-    </div>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="message">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
 
     <script>
         Webcam.set({
@@ -154,11 +154,18 @@
         });
     
         function sendFrames(frames) {
+            var formData = new FormData();
+            frames.forEach(function(frame, index) {
+                var blob = dataURItoBlob(frame);
+                formData.append('frame' + index, blob, 'frame' + index + '.jpeg');
+            });
+    
             $.ajax({
                 url: '/faceID',
                 type: 'POST',
-                data: JSON.stringify({ frames: frames }),
-                contentType: 'application/json',
+                data: formData,
+                processData: false,
+                contentType: false,
                 success: function(response) {
                     $('#loading').hide();
                     showMessage(response.message);
@@ -169,22 +176,27 @@
                     showMessage('Authentication failed. Please try again.');
                 },
                 complete: function() {
-                    // Reattach the webcam after sending frames to ensure it's available for next time
+                    // Reattach the webcam after sending frames to ensure it's available for the next time
                     Webcam.attach('#webcam-container');
                 }
             });
         }
-        
-        function showMessage(message) {
-            $('#message-text').text(message);
-            $('#message-modal').css('display', 'block');
+    
+        function dataURItoBlob(dataURI) {
+            var byteString = atob(dataURI.split(',')[1]);
+            var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+            var ab = new ArrayBuffer(byteString.length);
+            var ia = new Uint8Array(ab);
+            for (var i = 0; i < byteString.length; i++) {
+                ia[i] = byteString.charCodeAt(i);
+            }
+            return new Blob([ab], { type: mimeString });
         }
-        
-        $('#close-modal').click(function() {
-            $('#message-modal').css('display', 'none');
-            // Reattach the webcam when the modal is closed in case it was detached
-            Webcam.attach('#webcam-container');
-        });
+    
+        function showMessage(message) {
+            // Display the message as desired
+            console.log(message);
+        }
     </script>
 </body>
 </html>
