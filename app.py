@@ -7,12 +7,12 @@ from werkzeug.security import generate_password_hash, check_password_hash
 app = Flask(__name__)
 
 # Secret key for sessions
-app.secret_key = 'your_secret_key'
+app.secret_key = 'test'
 
 # Assuming we have a single user for demonstration purposes
 # In a real-world scenario, you would use a database
 user_info = {
-    "admin" : generate_password_hash("password123")  # Never store passwords in plain text
+    "admin" : generate_password_hash("password123")  #temp, should not Never store passwords in plain text
 }
 
 @app.route('/')
@@ -48,16 +48,14 @@ def faceID():
         for i in range(len(request.files)):
             frame = request.files['frame' + str(i)]
             frames.append(frame)
-        # Process the received frames for face scanning
-        # Implement your face scanning logic here
-        # For demonstration purposes, let's assume authentication is successful
+       
+        # For demonstration assumin authentication is successful
         if frames:
-            return redirect(url_for('home'))
+            return jsonify({'redirect': url_for('home')})  # Return JSON response with redirect URL
         else:
-            flash('Face not recognized')
+            return jsonify({'message': 'Face not recognized'})  # Return JSON response with message
     else:
         return render_template('faceid.html')
-
 @app.route('/logout')
 def logout():
     session.pop('username', None)
@@ -92,8 +90,8 @@ def process_scans():
         # TODO: Process each image_data, for example, save to a file or a database
         print(f"Received scan for {step}")
 
-    # After processing the scans, return a success response
-    # You might want to implement actual success checking logic based on your processing
+    
+    #  might want to implement actual success checking logic based on processing
     return jsonify({'success': True})
 
 # ... other route definitions ...
