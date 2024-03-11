@@ -2,6 +2,9 @@
 
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
+import os
+import base64
 # from camera import capture_and_upload_frames
 
 app = Flask(__name__)
@@ -14,6 +17,9 @@ app.secret_key = 'your_secret_key'
 user_info = {
     "admin" : generate_password_hash("password123")  # Never store passwords in plain text
 }
+
+UPLOAD_FOLDER = 'C:\\Users\\USER\\Desktop\\FDM\\FaceIDFrontEnd\\resources\\image'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 @app.route('/')
 def index():
@@ -47,6 +53,10 @@ def faceID():
         frames = []
         for i in range(len(request.files)):
             frame = request.files['frame' + str(i)]
+            filename = secure_filename(frame.filename)
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            with open(filepath, 'wb') as file:
+                file.write(frame.read())
             frames.append(frame)
         # Process the received frames for face scanning
         # Implement your face scanning logic here

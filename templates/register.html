@@ -194,7 +194,8 @@
                     canvas.height = webcam.videoHeight
                     canvas.getContext('2d').drawImage(webcam, 0, 0, canvas.width, canvas.height)
                     const imageData = canvas.toDataURL('image/jpeg')
-                    faceImages.push(imageData)
+                    var blob = b64toBlob(imageData)
+                    faceImages.push(blob)
                     setTimeout(captureImages, 200) // Capture image every 200ms
                   } else {
                     resolve()
@@ -205,34 +206,41 @@
             })
           }
 
-          faceScanInstructions.style.display = 'none'
-          loading.style.display = 'block'
+        faceScanInstructions.style.display = 'none'
+        loading.style.display = 'block'
 
-          const response = await fetch('/register', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              email: emailInput.value,
-              password: passwordInput.value,
-              faceImages: faceImages
-            })
+        const formData = new FormData();
+        formData.append('email', emailInput.value);
+        formData.append('password', passwordInput.value);
+        formData.append('faceImages', faceImages)
+
+        fetch('/register', {
+        method: 'POST',
+        body: formData
+        })
+          .then(response => {
+            if (response.ok) {
+              alert('Registration successful!');
+              window.location.href = '/login';
+            } else {
+              alert('Registration failed. Please try again.');
+            }
           })
-
-          if (response.ok) {
-            alert('Registration successful!')
-            window.location.href = '/login'
-          } else {
-            alert('Registration failed. Please try again.')
-          }
-        } catch (error) {
-          console.error('Error during face scan:', error)
-          alert('An error occurred during face scan. Please try again.')
-        } finally {
-          webcam.srcObject.getTracks().forEach((track) => track.stop())
-          loading.style.display = 'none'
+          .catch(error => {
+            console.error('Error during registration:', error);
+            alert('An error occurred during registration. Please try again.');
+          }); 
         }
+      }
+
+      function b64toBlob(base64) {
+        var byteCharacters = atob(base64);
+        var byteNumbers = new Array(byteCharacters.length);
+        for (var i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        var byteArray = new Uint8Array(byteNumbers);
+        return new Blob([byteArray], { type: 'image/jpeg' });
       }
     </script>
   </body>
