@@ -115,10 +115,9 @@ def register():
         return jsonify(message)
     return render_template('register.html')
 
-@app.route('/consent')
-def register():
-    
-    return render_template('consent.html')
+@app.route('/setup')
+def setup():
+    return render_template('setup.html')
 
 @app.route('/process_scans', methods=['POST'])
 def process_scans():

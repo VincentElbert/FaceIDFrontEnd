@@ -96,7 +96,7 @@
         }
         #popup {
           position: absolute;
-          top: calc(50% - 50px);
+          top: calc(50% - 100px);
           right: calc(40% - 180px);
           width: 200px;
           background-color: #fff;
@@ -150,6 +150,10 @@
         </div>
         <button type="submit" class="button primary-button">Next</button>
       </form>
+      <p>Already have an account? <a href="{{ url_for('login') }}" class="login-button">Login</a></p>
+      <div class="footer">
+          <p>&copy; FaceAuth Project</p>
+      </div>
       <div id="webcam-container" style="display: none;">
         <video id="webcam" width="400" height="300" autoplay style="transform: scaleX(-1);"></video>
       </div>

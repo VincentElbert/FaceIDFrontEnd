@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Set Up Guide</title>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f2f2f2;
+      font-family: Arial, sans-serif;
+    }
+    
+    .card {
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      width: 400px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .card-title {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    
+    .button {
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      background-color: #e3b18d;
+      color: white;
+      transition: background-color 0.3s ease;
+    }
+    
+    .button:hover {
+      background-color: #c69166;
+    }
+
+    .button-container {
+      display: flex;
+      justify-content: space-between;
+      width: 400px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <p>Welcome to Face Defense Master!</p>
+    <p>To ensure your security, we use facial recognition technology as part of our Multi-Factor Authentication (MFA) process.</p>
+    <p>We'll guide you through a quick and simple setup:</p>
+    <ol>
+      <li>Find a well-lit area with a clear background.</li>
+      <li>Ensure your face and the camera are not obstructed.</li>
+      <li>Follow the prompts to capture your facial data.</li>
+    </ol>
+    <p>Your privacy and data security are our top priorities. Rest assured, your facial data will only be used for MFA and stored securely.</p>
+    <p>Let's begin setting up your facial recognition for MFA!</p>
+  </div>
+  <div class="button-container">
+    <a href="{{ url_for('login') }}" class="button">Back</a>
+    <a href="{{ url_for('register') }}" class="button">Confirm and Proceed</a>
+  </div>
+</body>
+</html>
