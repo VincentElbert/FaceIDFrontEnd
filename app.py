@@ -4,6 +4,7 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 import os
+from datetime import datetime
 # from camera import capture_and_upload_frames
 
 app = Flask(__name__)
@@ -17,7 +18,7 @@ user_info = {
     "admin" : generate_password_hash("password123")  #temp, should not Never store passwords in plain text
 }
 
-UPLOAD_FOLDER = 'C:\\Users\\USER\\Desktop\\FDM\\FaceIDFrontEnd\\FaceIDFrontEnd\\resources\\image'
+UPLOAD_FOLDER = os.path.expanduser('~/')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 @app.route('/')
@@ -56,6 +57,11 @@ def faceID():
         for i in range(len(request.files)):
             frame = request.files['frame' + str(i)]
             filename = secure_filename(frame.filename)
+            
+            # Generate a unique filename with timestamp
+            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+            filename = f"{timestamp}_{filename}"
+            
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             with open(filepath, 'wb') as file:
                 file.write(frame.read())
@@ -68,10 +74,13 @@ def faceID():
             return jsonify({'message': 'Face not recognized'})  # Return JSON response with message
     else:
         return render_template('faceid.html')
+
 @app.route('/logout')
 def logout():
     session.pop('username', None)
     return redirect(url_for('login'))
+
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -85,7 +94,11 @@ def register():
         for index, image in enumerate(face_images):
             if image.filename == '':
                 continue
-            filename = secure_filename(image.filename)
+            
+            # Generate a unique filename with timestamp and index
+            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+            filename = f"{email}_{timestamp}_{index}.{image.filename.split('.')[-1]}"
+            
             save_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             with open(save_path, 'wb') as file:
                 file.write(image.read())
@@ -94,7 +107,6 @@ def register():
             # check if the face registration in register.html is successful
             success = True
             if success:
-                
                 message = 'Registration successful!'
             else:
                 message = 'Registration failed.'
@@ -103,6 +115,7 @@ def register():
         
         return jsonify(message)
     return render_template('register.html')
+
 
 @app.route('/process_scans', methods=['POST'])
 def process_scans():
