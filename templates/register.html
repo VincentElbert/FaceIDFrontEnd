@@ -177,6 +177,7 @@
     const faceImages = []
 
     for (const step of faceScanSteps) {
+      count = 0
       faceScanInstructions.textContent = `Please position yourself for ${step.toLowerCase()} scan.`
       faceScanInstructions.style.display = 'block'
       const poseReadyBtn = document.getElementById('pose-ready-btn')
@@ -188,13 +189,14 @@
           faceScanInstructions.textContent = `Scanning ${step.toLowerCase()}...`
 
           const captureImages = () => {
-            if (faceImages.length < 15) {
+            if (count < 15) {
               const canvas = document.createElement('canvas')
               canvas.width = webcam.videoWidth
               canvas.height = webcam.videoHeight
               canvas.getContext('2d').drawImage(webcam, 0, 0, canvas.width, canvas.height)
               const imageData = canvas.toDataURL('image/jpeg')
               faceImages.push(dataURItoBlob(imageData))
+              count ++
               setTimeout(captureImages, 200) // Capture image every 200ms
             } else {
               resolve()
