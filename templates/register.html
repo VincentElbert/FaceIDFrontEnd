@@ -194,8 +194,7 @@
                     canvas.height = webcam.videoHeight
                     canvas.getContext('2d').drawImage(webcam, 0, 0, canvas.width, canvas.height)
                     const imageData = canvas.toDataURL('image/jpeg')
-                    var blob = b64toBlob(imageData)
-                    faceImages.push(blob)
+                    faceImages.push(imageData)
                     setTimeout(captureImages, 200) // Capture image every 200ms
                   } else {
                     resolve()
@@ -205,29 +204,20 @@
               }
             })
           }
-<<<<<<< Updated upstream
-
-          
-
-          faceScanInstructions.style.display = 'none'
-          loading.style.display = 'block'
-          
-          const formData = new FormData();
-          formData.append('email', emailInput.value);
-          formData.append('password', passwordInput.value);
-          formData.append('faceImages', faceImages)
-=======
       
           faceScanInstructions.style.display = 'none'
           loading.style.display = 'block'
       
->>>>>>> Stashed changes
           const response = await fetch('/register', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
             },
-            body: formData
+            body: JSON.stringify({
+              email: emailInput.value,
+              password: passwordInput.value,
+              faceImages: faceImages
+            })
           })
       
           if (response.ok) {
@@ -243,7 +233,6 @@
           webcam.srcObject.getTracks().forEach((track) => track.stop())
           loading.style.display = 'none'
         }
-        
       }
     </script>
   </body>

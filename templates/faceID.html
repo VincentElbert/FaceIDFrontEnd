@@ -1,111 +1,10 @@
 <!DOCTYPE html>
 <html>
-<head>
+  <head>
     <title>Face Scanning</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/webcamjs/1.0.26/webcam.min.js"></script>
     <style>
-<<<<<<< Updated upstream
-
-        :root {
-            border-top: 8px solid #e3b18d; /* Updated to use the orange decorative element color */
-            
-          }
-          
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f2f2f2;
-            font-family: Arial, sans-serif;
-        }
-        
-        .card {
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            width: 400px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        
-        .card-title {
-            font-size: 24px;
-            margin-bottom: 20px;
-        }
-        
-        #webcam-container {
-            margin-bottom: 20px;
-            border-radius: 10px;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-        }
-        
-        .button {
-            padding: 10px 20px;
-            font-size: 16px;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        
-        .authenticate-btn {
-            background-color: #4CAF50;
-            color: white;
-            margin-right: 10px;
-        }
-        
-        .go-back-btn {
-            background-color: #ccc;
-            color: black;
-        }
-        
-        #loading {
-            display: none;
-            margin-top: 20px;
-            font-size: 18px;
-            color: #666;
-        }
-        
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.4);
-        }
-        
-        .modal-content {
-            background-color: #fefefe;
-            margin: 15% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 300px;
-            text-align: center;
-            border-radius: 10px;
-        }
-    </style>
-</head>
-<body>
-    <div class="card">
-        <h1 class="card-title">Face Scanning Authentication</h1>
-            <div id="webcam-container">
-
-            </div>
-=======
       :root {
         border-top: 8px solid #e3b18d; /* Updated to use the orange decorative element color */
       }
@@ -194,64 +93,55 @@
         <button id="authenticate-btn" class="button authenticate-btn primary-button">Authenticate</button>
         <button id="go-back-btn" class="button go-back-btn secondary-button">Go Back</button>
       </div>
->>>>>>> Stashed changes
 
-            <div>
-            <button id="authenticate-btn" class="button authenticate-btn">Authenticate</button>
-            <button id="go-back-btn" class="button go-back-btn">Go Back</button>
-            
-            </div>
-            
-            <div id="loading">Authenticating...</div>
+      <div id="loading">Authenticating...</div>
     </div>
     {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            {% for message in messages %}
-                <div class="message">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
+      {% if messages %}
+        {% for message in messages %}
+          <div class="message">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
     {% endwith %}
 
     <script>
-        Webcam.set({
-            width: 320,
-            height: 240,
-            image_format: 'jpeg',
-            jpeg_quality: 90,
-            flip_horiz: true // Flip camera horizontally
-        });
-       
-        Webcam.attach('#webcam-container');
-    
-        $('#authenticate-btn').click(function() {
-            var frames = [];
-            $('#loading').show();
-            var captureFrame = function() {
-                Webcam.snap(function(data_uri) {
-                    frames.push(data_uri);
-                    if (frames.length < 30) {
-                        setTimeout(captureFrame, 100);
-                    } else {
-                        sendFrames(frames);
-                    }
-                });
-            };
-            captureFrame();
-        });
-    
-        $('#go-back-btn').click(function() {
-            // Add logic to go back to the previous page or desired location
-            window.history.back();
-        });
-    
-        function sendFrames(frames) {
+      Webcam.set({
+        width: 320,
+        height: 240,
+        image_format: 'jpeg',
+        jpeg_quality: 90,
+        flip_horiz: true // Flip camera horizontally
+      })
+      
+      Webcam.attach('#webcam-container')
+      
+      $('#authenticate-btn').click(function () {
+        var frames = []
+        $('#loading').show()
+        var captureFrame = function () {
+          Webcam.snap(function (data_uri) {
+            frames.push(data_uri)
+            if (frames.length < 30) {
+              setTimeout(captureFrame, 100)
+            } else {
+              sendFrames(frames)
+            }
+          })
+        }
+        captureFrame()
+      })
+      
+      $('#go-back-btn').click(function () {
+        // Add logic to go back to the previous page or desired location
+        window.history.back()
+      })
+      
+      function sendFrames(frames) {
         var formData = new FormData()
-        
-        frames.forEach(function(frame, index) {
-            var base64 = frame.split(',')[1]; // Extract the base64 string from the data URI
-            var blob = b64toBlob(base64);
-            formData.append('frame' + index, blob, 'frame' + index + '.jpeg');
-        });
+        frames.forEach(function (frame, index) {
+          var blob = dataURItoBlob(frame)
+          formData.append('frame' + index, blob, 'frame' + index + '.jpeg')
+        })
       
         $.ajax({
           url: '/faceID',
@@ -280,20 +170,21 @@
         })
       }
       
-        function b64toBlob(base64) {
-            var byteCharacters = atob(base64);
-            var byteNumbers = new Array(byteCharacters.length);
-            for (var i = 0; i < byteCharacters.length; i++) {
-                byteNumbers[i] = byteCharacters.charCodeAt(i);
-            }
-            var byteArray = new Uint8Array(byteNumbers);
-            return new Blob([byteArray], { type: 'image/jpeg' });
+      function dataURItoBlob(dataURI) {
+        var byteString = atob(dataURI.split(',')[1])
+        var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0]
+        var ab = new ArrayBuffer(byteString.length)
+        var ia = new Uint8Array(ab)
+        for (var i = 0; i < byteString.length; i++) {
+          ia[i] = byteString.charCodeAt(i)
         }
-        
-        function showMessage(message) {
-            // Display the message as desired
-            console.log(message);
-        }
+        return new Blob([ab], { type: mimeString })
+      }
+      
+      function showMessage(message) {
+        // Display the message as desired
+        console.log(message)
+      }
     </script>
-</body>
+  </body>
 </html>
