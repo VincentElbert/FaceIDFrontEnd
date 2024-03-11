@@ -88,12 +88,38 @@
           color: #666;
         }
         
-      #loading {
-        display: none;
-        margin-top: 20px;
-        font-size: 18px;
-        color: #666;
-      }
+        #loading {
+          display: none;
+          margin-top: 20px;
+          font-size: 18px;
+          color: #666;
+        }
+        #popup {
+          position: absolute;
+          top: calc(50% - 50px);
+          right: calc(40% - 180px);
+          width: 200px;
+          background-color: #fff;
+          border: 1px solid #ccc;
+          border-radius: 5px;
+          padding: 10px;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+          display: none;
+          z-index: 1;
+        }
+
+        #popup-content {
+          text-align: center;
+        }
+
+        #popup-title {
+          font-size: 16px;
+          margin-bottom: 5px;
+        }
+
+        #popup-message {
+          font-size: 14px;
+        }
     </style>
     <link rel="stylesheet" href="{{ url_for('static', filename = 'style.css') }}" />
   </head>
@@ -110,12 +136,16 @@
         <div class="form-group">
           <label for="password">Password:</label>
           <input type="password" id="password" name="password" required />
-          <div class="hint">Password must be at least 8 characters long</div>
+          <div id="popup" style="display: none;">
+            <div id="popup-content">
+              <h2 id="popup-title"></h2>
+              <p id="popup-message"></p>
+            </div>
+          </div>
         </div>
         <div class="form-group">
-          <label for="verify-password">Verify Password:</label>
+          <label for="verify-password">Confirm Password:</label>
           <input type="password" id="verify-password" name="verify-password" required />
-          <div class="hint">Re-enter your password for verification</div>
           <div class="error-message" id="password-error"></div>
         </div>
         <button type="submit" class="button primary-button">Next</button>
@@ -149,7 +179,12 @@
         } else {
           emailError.textContent = ''
         }
-      
+
+        if (!isValidPassword(passwordInput.value)) {
+          displayPopup('Password Error', 'Password must be at least 8 characters with a combination of uppercase letters, lowercase letters, numbers, and symbols')
+          return
+        }
+
         if (passwordInput.value !== verifyPasswordInput.value) {
           passwordError.textContent = 'Passwords do not match.'
           return
@@ -167,7 +202,23 @@
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
         return emailRegex.test(email)
       }
+
+      function isValidPassword(password) {
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,14}$/
+        return passwordRegex.test(password)
+      }
       
+      function displayPopup(title, message) {
+        const popup = document.getElementById('popup')
+        const popupTitle = document.getElementById('popup-title')
+        const popupMessage = document.getElementById('popup-message')
+
+        popupTitle.textContent = title
+        popupMessage.textContent = message
+
+        popup.style.display = 'block'
+      }
+
       async function startFaceScan() {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })

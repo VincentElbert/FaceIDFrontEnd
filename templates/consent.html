@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Consent</title>
+    <style>
+      :root {
+        border-top: 8px solid #e3b18d;
+      }
+
+      body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin: 0;
+        background-color: #f2f2f2;
+        font-family: Arial, sans-serif;
+      }
+
+      .card {
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        width: 400px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .card-title {
+        font-size: 24px;
+        margin-bottom: 20px;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+        width: 100%;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 5px;
+        text-align: left;
+      }
+
+      input[type="email"],
+      input[type="password"] {
+        width: 100%;
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+      }
+
+      .error-message {
+        color: red;
+        margin-top: 5px;
+        text-align: left;
+      }
+
+      .button {
+        padding: 10px 20px;
+        font-size: 16px;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+      }
+
+      #webcam-container {
+        margin-top: 20px;
+        border-radius: 10px;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+      }
+
+      #face-scan-instructions {
+        margin-top: 20px;
+        font-size: 18px;
+        color: #666;
+      }
+
+      #loading {
+        display: none;
+        margin-top: 20px;
+        font-size: 18px;
+        color: #666;
+      }
+
+      #popup {
+        position: absolute;
+        top: calc(50% - 50px);
+        right: calc(40% - 180px);
+        width: 200px;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        display: none;
+        z-index: 1;
+      }
+
+      #popup-content {
+        text-align: center;
+      }
+
+      #popup-title {
+        font-size: 16px;
+        margin-bottom: 5px;
+      }
+
+      #popup-message {
+        font-size: 14px;
+      }
+    </style>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename = 'style.css') }}"
+    />
+  </head>
+  <body>
+    <!-- Letter of Agreement -->
+    <div class="card">
+      <p>Welcome to Face Defense Master!</p>
+      <p>
+        To ensure your security, we use facial recognition technology as part of
+        our Multi-Factor Authentication (MFA) process.
+      </p>
+      <p>We'll guide you through a quick and simple setup:</p>
+      <ol>
+        <li>Find a well-lit area with a clear background.</li>
+        <li>Ensure your face and the camera are not obstructed.</li>
+        <li>Follow the prompts to capture your facial data.</li>
+      </ol>
+      <p>
+        Your privacy and data security are our top priorities. Rest assured,
+        your facial data will only be used for MFA and stored securely.
+      </p>
+      <p>Let's begin setting up your facial recognition for MFA!</p>
+    </div>
+  </body>
+</html>

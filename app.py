@@ -80,8 +80,6 @@ def logout():
     session.pop('username', None)
     return redirect(url_for('login'))
 
-
-
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -117,6 +115,10 @@ def register():
         return jsonify(message)
     return render_template('register.html')
 
+@app.route('/consent')
+def register():
+    
+    return render_template('consent.html')
 
 @app.route('/process_scans', methods=['POST'])
 def process_scans():
