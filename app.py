@@ -4,7 +4,6 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 import os
-import base64
 # from camera import capture_and_upload_frames
 
 app = Flask(__name__)
@@ -18,7 +17,7 @@ user_info = {
     "admin" : generate_password_hash("password123")  #temp, should not Never store passwords in plain text
 }
 
-UPLOAD_FOLDER = 'C:\\Users\\USER\\Desktop\\FDM\\FaceIDFrontEnd\\resources\\image'
+UPLOAD_FOLDER = 'C:\\Users\\USER\\Desktop\\FDM\\FaceIDFrontEnd\\FaceIDFrontEnd\\resources\\image'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 @app.route('/')
@@ -39,9 +38,12 @@ def login():
         username = request.form['username']
         password = request.form['password']
 
-        if check_password_hash(user_info[username], password):
-            session['username'] = username
-            return redirect(url_for('faceID'))
+        if username in user_info.keys():
+            if check_password_hash(user_info[username], password):
+                session['username'] = username
+                return redirect(url_for('faceID'))
+            else:
+                flash('Invalid username or password!')
         else:
             flash('Invalid username or password!')
 
@@ -77,17 +79,28 @@ def register():
         email = request.form.get('email')
         password = request.form.get('password')
         face_images = request.files.getlist('faceImages')
-
         # Store the registration data in the user_info dictionary
         user_info[email] = generate_password_hash(password)
+
+        for index, image in enumerate(face_images):
+            if image.filename == '':
+                continue
+            filename = secure_filename(image.filename)
+            save_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            with open(save_path, 'wb') as file:
+                file.write(image.read())
+        
         if email and password and face_images:
             # check if the face registration in register.html is successful
             success = True
             if success:
+                
                 message = 'Registration successful!'
             else:
                 message = 'Registration failed.'
-
+        else:
+            message = 'Registration failed.'
+        
         return jsonify(message)
     return render_template('register.html')
 

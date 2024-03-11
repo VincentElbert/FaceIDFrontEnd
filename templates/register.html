@@ -169,70 +169,81 @@
       }
       
       async function startFaceScan() {
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
-          webcam.srcObject = stream
-      
-          const faceScanSteps = ['Front Face', 'Side of Face', 'Bottom of Face']
-          const faceImages = []
-      
-          for (const step of faceScanSteps) {
-            faceScanInstructions.textContent = `Please position yourself for ${step.toLowerCase()} scan.`
-            faceScanInstructions.style.display = 'block'
-            const poseReadyBtn = document.getElementById('pose-ready-btn')
-            poseReadyBtn.style.display = 'block'
-      
-            await new Promise((resolve) => {
-              poseReadyBtn.onclick = () => {
-                poseReadyBtn.style.display = 'none'
-                faceScanInstructions.textContent = `Scanning ${step.toLowerCase()}...`
-      
-                const captureImages = () => {
-                  if (faceImages.length < 15) {
-                    const canvas = document.createElement('canvas')
-                    canvas.width = webcam.videoWidth
-                    canvas.height = webcam.videoHeight
-                    canvas.getContext('2d').drawImage(webcam, 0, 0, canvas.width, canvas.height)
-                    const imageData = canvas.toDataURL('image/jpeg')
-                    faceImages.push(imageData)
-                    setTimeout(captureImages, 200) // Capture image every 200ms
-                  } else {
-                    resolve()
-                  }
-                }
-                captureImages()
-              }
-            })
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+    webcam.srcObject = stream
+
+    const faceScanSteps = ['Front Face', 'Side of Face', 'Bottom of Face']
+    const faceImages = []
+
+    for (const step of faceScanSteps) {
+      faceScanInstructions.textContent = `Please position yourself for ${step.toLowerCase()} scan.`
+      faceScanInstructions.style.display = 'block'
+      const poseReadyBtn = document.getElementById('pose-ready-btn')
+      poseReadyBtn.style.display = 'block'
+
+      await new Promise((resolve) => {
+        poseReadyBtn.onclick = () => {
+          poseReadyBtn.style.display = 'none'
+          faceScanInstructions.textContent = `Scanning ${step.toLowerCase()}...`
+
+          const captureImages = () => {
+            if (faceImages.length < 15) {
+              const canvas = document.createElement('canvas')
+              canvas.width = webcam.videoWidth
+              canvas.height = webcam.videoHeight
+              canvas.getContext('2d').drawImage(webcam, 0, 0, canvas.width, canvas.height)
+              const imageData = canvas.toDataURL('image/jpeg')
+              faceImages.push(dataURItoBlob(imageData))
+              setTimeout(captureImages, 200) // Capture image every 200ms
+            } else {
+              resolve()
+            }
           }
-      
-          faceScanInstructions.style.display = 'none'
-          loading.style.display = 'block'
-      
-          const response = await fetch('/register', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              email: emailInput.value,
-              password: passwordInput.value,
-              faceImages: faceImages
-            })
-          })
-      
-          if (response.ok) {
-            alert('Registration successful!')
-            window.location.href = '/login'
-          } else {
-            alert('Registration failed. Please try again.')
-          }
-        } catch (error) {
-          console.error('Error during face scan:', error)
-          alert('An error occurred during face scan. Please try again.')
-        } finally {
-          webcam.srcObject.getTracks().forEach((track) => track.stop())
-          loading.style.display = 'none'
+          captureImages()
         }
+      })
+    }
+
+    faceScanInstructions.style.display = 'none'
+    loading.style.display = 'block'
+
+    const formData = new FormData()
+    formData.append('email', emailInput.value)
+    formData.append('password', passwordInput.value)
+    faceImages.forEach((file, index) => {
+      formData.append(`faceImages_${index}`, file, `faceImage_${index}.jpg`)
+    })
+
+    const response = await fetch('/register', {
+      method: 'POST',
+      body: formData
+    })
+
+    if (response.ok) {
+      alert('Registration successful!')
+      window.location.href = '/login'
+    } else {
+      alert('Registration failed. Please try again.')
+    }
+    } catch (error) {
+      console.error('Error during face scan:', error)
+      alert('An error occurred during face scan. Please try again.')
+    } finally {
+      webcam.srcObject.getTracks().forEach((track) => track.stop())
+      loading.style.display = 'none'
+    }
+  }
+
+      function dataURItoBlob(dataURI) {
+        const byteString = atob(dataURI.split(',')[1])
+        const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0]
+        const ab = new ArrayBuffer(byteString.length)
+        const ia = new Uint8Array(ab)
+        for (let i = 0; i < byteString.length; i++) {
+          ia[i] = byteString.charCodeAt(i)
+        }
+        return new Blob([ab], { type: mimeString })
       }
     </script>
   </body>
