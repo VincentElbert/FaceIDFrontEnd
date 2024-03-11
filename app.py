@@ -18,7 +18,7 @@ user_info = {
     "admin" : generate_password_hash("password123")  #temp, should not Never store passwords in plain text
 }
 
-UPLOAD_FOLDER = os.path.expanduser('~/')
+UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'resources', 'image')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 @app.route('/')
@@ -87,23 +87,24 @@ def register():
     if request.method == 'POST':
         email = request.form.get('email')
         password = request.form.get('password')
-        face_images = request.files.getlist('faceImages')
         # Store the registration data in the user_info dictionary
         user_info[email] = generate_password_hash(password)
 
-        for index, image in enumerate(face_images):
-            if image.filename == '':
-                continue
+        frames = []
+        index = 0
+        while f'faceImages_{index}' in request.files:
+            frame = request.files[f'faceImages_{index}']
             
             # Generate a unique filename with timestamp and index
             timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-            filename = f"{email}_{timestamp}_{index}.{image.filename.split('.')[-1]}"
+            filename = f"{email}_{timestamp}_{index}.{frame.filename.split('.')[-1]}"
             
             save_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            with open(save_path, 'wb') as file:
-                file.write(image.read())
+            frame.save(save_path)
+            frames.append(frame)
+            index += 1
         
-        if email and password and face_images:
+        if email and password and frames:
             # check if the face registration in register.html is successful
             success = True
             if success:
