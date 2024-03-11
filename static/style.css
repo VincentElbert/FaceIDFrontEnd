@@ -1,28 +1,80 @@
 /* static/css/style.css */
 
-html, body {
-    height: 100%;
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+
+
+body {
     margin: 0;
     display: flex;
-    align-items: center;
     justify-content: center;
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    background: #e2e1e0;
+    align-items: center;
+    min-height: 100vh;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+
+    animation: gradientSwirl 15s ease infinite;
     text-align: center;
 }
+
 
 .container {
     max-width: 400px;
     margin: auto;
     padding: 2em;
-    background: #fff;
+    background: rgba(255, 255, 255, 0.9);
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 0.8s ease-in-out;
+    transition: transform 0.3s ease-in-out;
+    margin: 1rem;
+
+}
+.card {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+.align-fix {
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+
+}
+
+
+.container:hover {
+    transform: translateY(-5px);
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 h2 {
     margin-bottom: 1em;
-    color: #333;
+    color: #ff6b6b;
+    transition: color 0.3s ease-in-out;
+}
+
+h2:hover {
+    color: #4ecdc4;
 }
 
 input[type="text"],
@@ -30,8 +82,17 @@ input[type="password"] {
     width: calc(100% - 20px);
     margin-bottom: 1em;
     padding: 10px;
-    border: 1px solid #ccc;
+    border: none;
     border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.8);
+    transition: background-color 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus {
+    background-color: rgba(255, 255, 255, 0.9);
+    outline: none;
+    transform: scale(1.02);
 }
 
 input[type="submit"] {
@@ -39,24 +100,105 @@ input[type="submit"] {
     padding: 10px;
     border: none;
     border-radius: 5px;
-    background-color: #5cb85c;
+    background-color: #ff6b6b;
     color: white;
     font-size: 1em;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s ease-in-out, transform 0.3s ease-in-out;
 }
 
 input[type="submit"]:hover {
-    background-color: #4cae4c;
+    background-color: #ff4757;
+    transform: scale(1.02);
 }
 
 .message {
-    color: #d9534f;
+    color: #ff6b6b;
     margin: 1em 0;
+    animation: fadeIn 0.8s ease-in-out;
 }
+
+.register-button {
+    color: #4ecdc4;
+    text-decoration: none;
+    transition: color 0.3s ease-in-out;
+}
+
+.register-button:hover .button:hover {
+    color: #ff6b6b;
+}
+
+
+.secondary-button {
+    background-color: #3a9b97;
+    text-decoration: none;
+    transition: color 0.3s ease-in-out;
+    color: aliceblue
+}
+
+.secondary-button:hover {
+    background-color: #45c1bd;
+}
+
+
+.primary-button {
+    background-color: #ff4757;
+    text-decoration: none;
+    transition: color 0.3s ease-in-out;
+    color: aliceblue
+}
+
+.primary-button:hover {
+    background-color: #ff6b6b;
+}
+
 
 .footer {
     margin-top: 2em;
-    color: #888;
+    color: #000000;
     font-size: 0.8em;
+    transition: color 0.3s ease-in-out;
+}
+
+.footer:hover {
+    color: #ff6b6b;
+}
+
+.hint {
+    font-size: 12px;
+    color: #888;
+    
+    text-align: left;
+}
+
+input[type='email'],
+input[type='password'] {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.error-message {
+    color: red;
+    margin-top: 5px;
+    text-align: left;
+}
+
+
+
+#webcam-container {
+    margin-top: 20px;
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+#face-scan-instructions {
+    margin-top: 20px;
+    font-size: 18px;
+    color: #666;
 }

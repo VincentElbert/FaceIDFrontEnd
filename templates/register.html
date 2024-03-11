@@ -70,27 +70,24 @@
         border-radius: 5px;
       }
       
-      .next-btn {
-        background-color: #4caf50;
-        color: white;
-      }
-      
-      #webcam-container {
-        margin-top: 20px;
-        border-radius: 10px;
-        overflow: hidden;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 100%;
-      }
-      
-      #face-scan-instructions {
-        margin-top: 20px;
-        font-size: 18px;
-        color: #666;
-      }
-      
+        
+        
+        #webcam-container {
+          margin-top: 20px;
+          border-radius: 10px;
+          overflow: hidden;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: 100%;
+        }
+        
+        #face-scan-instructions {
+          margin-top: 20px;
+          font-size: 18px;
+          color: #666;
+        }
+        
       #loading {
         display: none;
         margin-top: 20px;
@@ -98,6 +95,7 @@
         color: #666;
       }
     </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename = 'style.css') }}" />
   </head>
   <body>
     <div class="card">
@@ -106,26 +104,29 @@
         <div class="form-group">
           <label for="email">Email:</label>
           <input type="email" id="email" name="email" required />
+         
           <div class="error-message" id="email-error"></div>
         </div>
         <div class="form-group">
           <label for="password">Password:</label>
           <input type="password" id="password" name="password" required />
+          <div class="hint">Password must be at least 8 characters long</div>
         </div>
         <div class="form-group">
           <label for="verify-password">Verify Password:</label>
           <input type="password" id="verify-password" name="verify-password" required />
+          <div class="hint">Re-enter your password for verification</div>
           <div class="error-message" id="password-error"></div>
         </div>
-        <button type="submit" class="button next-btn">Next</button>
+        <button type="submit" class="button primary-button">Next</button>
       </form>
-        <div id="webcam-container" style="display: none;">
-          <video id="webcam" width="400" height="300" autoplay style="transform: scaleX(-1);"></video>
-        </div>
-        <div id="face-scan-instructions" style="display: none;"></div>
-        <button id="pose-ready-btn" class="button" style="display: none;">Ready</button>
-        <div id="loading" style="display: none;">Processing...</div>
+      <div id="webcam-container" style="display: none;">
+        <video id="webcam" width="400" height="300" autoplay style="transform: scaleX(-1);"></video>
       </div>
+      <div id="face-scan-instructions" style="display: none;"></div>
+      <button id="pose-ready-btn" class="button primary-button" style="display: none;">Ready</button>
+      <div id="loading" style="display: none;">Processing...</div>
+    </div>
 
     <script>
       const registrationForm = document.getElementById('registration-form')
@@ -167,26 +168,25 @@
         return emailRegex.test(email)
       }
       
-      
       async function startFaceScan() {
         try {
           const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
           webcam.srcObject = stream
-
+      
           const faceScanSteps = ['Front Face', 'Side of Face', 'Bottom of Face']
           const faceImages = []
-
+      
           for (const step of faceScanSteps) {
             faceScanInstructions.textContent = `Please position yourself for ${step.toLowerCase()} scan.`
             faceScanInstructions.style.display = 'block'
             const poseReadyBtn = document.getElementById('pose-ready-btn')
             poseReadyBtn.style.display = 'block'
-
+      
             await new Promise((resolve) => {
               poseReadyBtn.onclick = () => {
                 poseReadyBtn.style.display = 'none'
                 faceScanInstructions.textContent = `Scanning ${step.toLowerCase()}...`
-                
+      
                 const captureImages = () => {
                   if (faceImages.length < 15) {
                     const canvas = document.createElement('canvas')
@@ -205,6 +205,7 @@
               }
             })
           }
+<<<<<<< Updated upstream
 
           
 
@@ -215,6 +216,12 @@
           formData.append('email', emailInput.value);
           formData.append('password', passwordInput.value);
           formData.append('faceImages', faceImages)
+=======
+      
+          faceScanInstructions.style.display = 'none'
+          loading.style.display = 'block'
+      
+>>>>>>> Stashed changes
           const response = await fetch('/register', {
             method: 'POST',
             headers: {
@@ -222,7 +229,7 @@
             },
             body: formData
           })
-
+      
           if (response.ok) {
             alert('Registration successful!')
             window.location.href = '/login'
