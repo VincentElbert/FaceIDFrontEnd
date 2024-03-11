@@ -154,35 +154,41 @@
         });
     
         function sendFrames(frames) {
-            var formData = new FormData();
-            frames.forEach(function(frame, index) {
-                var base64 = frame.split(',')[1]; // Extract the base64 string from the data URI
-                var blob = b64toBlob(base64);
-                formData.append('frame' + index, blob, 'frame' + index + '.jpeg');
-            });
-
-            $.ajax({
-                url: '/faceID',
-                type: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                $('#loading').hide();
-                showMessage(response.message);
-                },
-                error: function(xhr, status, error) {
-                $('#loading').hide();
-                console.error(error);
-                showMessage('Authentication failed. Please try again.');
-                },
-                complete: function() {
-                // Reattach the webcam after sending frames to ensure it's available for the next time
-                Webcam.attach('#webcam-container');
-                }
-            });
+        var formData = new FormData()
+        
+        frames.forEach(function(frame, index) {
+            var base64 = frame.split(',')[1]; // Extract the base64 string from the data URI
+            var blob = b64toBlob(base64);
+            formData.append('frame' + index, blob, 'frame' + index + '.jpeg');
+        });
+      
+        $.ajax({
+          url: '/faceID',
+          type: 'POST',
+          data: formData,
+          processData: false,
+          contentType: false,
+          success: function (response) {
+            $('#loading').hide()
+            if (response.redirect) {
+              
+              window.location.href = response.redirect
+            } else {
+              showMessage(response.message)
             }
-
+          },
+          error: function (xhr, status, error) {
+            $('#loading').hide()
+            console.error(error)
+            showMessage('Authentication failed. Please try again.')
+          },
+          complete: function () {
+            // Reattach the webcam after sending frames to ensure it's available for the next time
+            Webcam.attach('#webcam-container')
+          }
+        })
+      }
+      
         function b64toBlob(base64) {
             var byteCharacters = atob(base64);
             var byteNumbers = new Array(byteCharacters.length);
@@ -192,7 +198,7 @@
             var byteArray = new Uint8Array(byteNumbers);
             return new Blob([byteArray], { type: 'image/jpeg' });
         }
-    
+        
         function showMessage(message) {
             // Display the message as desired
             console.log(message);
