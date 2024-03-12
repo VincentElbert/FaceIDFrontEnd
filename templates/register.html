@@ -150,16 +150,16 @@
         </div>
         <button type="submit" class="button primary-button">Next</button>
       </form>
-      <p>Already have an account? <a href="{{ url_for('login') }}" class="login-button">Login</a></p>
-      <div class="footer">
-          <p>&copy; FaceAuth Project</p>
-      </div>
       <div id="webcam-container" style="display: none;">
         <video id="webcam" width="400" height="300" autoplay style="transform: scaleX(-1);"></video>
       </div>
       <div id="face-scan-instructions" style="display: none;"></div>
       <button id="pose-ready-btn" class="button primary-button" style="display: none;">Ready</button>
       <div id="loading" style="display: none;">Processing...</div>
+    </div>
+    <p>Already have an account? <a href="{{ url_for('login') }}" class="login-button">Login</a></p>
+    <div class="footer">
+        <p>&copy; FaceAuth Project</p>
     </div>
 
     <script>
@@ -187,6 +187,8 @@
         if (!isValidPassword(passwordInput.value)) {
           displayPopup('Password Error', 'Password must be at least 8 characters with a combination of uppercase letters, lowercase letters, numbers, and symbols')
           return
+        } else {
+          popup.style.display = 'none'
         }
 
         if (passwordInput.value !== verifyPasswordInput.value) {
