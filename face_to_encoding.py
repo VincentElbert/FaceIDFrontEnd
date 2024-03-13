@@ -37,6 +37,7 @@ def encodeByPerson(imgpath, person, txtpath):
 
 
     file = open(txtpath, "a")
+    file.write('\n')
     for (name, encoding) in zip(names, encodings):
         print(encodingToLine(name, encoding))
         file.write(encodingToLine(name, encoding))
@@ -50,7 +51,7 @@ def checkFace(imgpath):
     if len(face_bounding_boxes) == 1:
         return True
     else:
-        print(imgpath + "does not contain one face")
+        print(imgpath + " does not contain one face; it contains: " + str(len(face_bounding_boxes)))
         return False
 
 def checkValidCamInput(imgpath, acceptableNum):
