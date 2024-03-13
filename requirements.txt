@@ -1,7 +1,0 @@
-flask
-sqla-wrapper
-flask-login
-dlib
-face_recognition
-numpy
-scikit-learn
