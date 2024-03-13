@@ -6,8 +6,8 @@ from werkzeug.utils import secure_filename
 import os
 from datetime import datetime
 # from camera import capture_and_upload_frames
-from inference import infer
-from face_to_encoding import encodeSet, encodeByPerson
+from inference import infer, loginInfer
+from face_to_encoding import encodeSet, encodeByPerson, checkValidCamInput
 from train import train
 
 app = Flask(__name__)
@@ -127,15 +127,18 @@ def register():
             index += 1
 
         if email and password and frames:
-            # check if the face registration in register.html is successful
-            success = True
+            if checkValidCamInput(app.config['UPLOAD_FOLDER'] + '/' + email, 30):
+                # check if the face registration in register.html is successful
+                success = True
 
-            # Initailize models
-            encodeByPerson(app.config['UPLOAD_FOLDER'], email, app.config['ENCODINGS_PATH'])
-            train(app.config['ENCODINGS_PATH'])
-            
-            if success:
-                message = 'Registration successful!'
+                # Initailize models
+                encodeByPerson(app.config['UPLOAD_FOLDER'], email, app.config['ENCODINGS_PATH'])
+                train(app.config['ENCODINGS_PATH'])
+
+                if success:
+                    message = 'Registration successful!'
+                else:
+                    message = 'Registration failed.'
             else:
                 message = 'Registration failed.'
         else:
