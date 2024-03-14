@@ -6,29 +6,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <script>
-        function validateForm() {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            if (username.trim() === '' || password.trim() === '') {
-                document.getElementById('message').textContent = 'Please enter both username and password.';
-                return false;
-            }
-            return true;
+    <style>
+        #logo {
+            width: 450px !important;
         }
-    </script>
+    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+    <img id="logo" src="static/face_defense_master_logo.png" alt="logo"/>
     <div class="container">
-        <h2>Login to Your Account</h2>
-        <form method="post" onsubmit="return validateForm()">
+        <form id="login-form" method="post" onsubmit="return validateForm()">
             <input type="text" id="username" name="username" placeholder="Username" required>
             <input type="password" id="password" name="password" placeholder="Password" required>
             <input type="submit" value="Login">
             <div id="message" class="message"></div>
+            <p>Don't have an account? <a href="{{ url_for('setup') }}" class="link-button">Register</a></p>
         </form>
-        <p>Don't have an account? <a href="{{ url_for('setup') }}" class="register-button">Register</a></p>
         {% with messages = get_flashed_messages() %}
             {% if messages %}
                 {% for message in messages %}
@@ -36,9 +30,6 @@
                 {% endfor %}
             {% endif %}
         {% endwith %}
-        <div class="footer">
-            <p>&copy; FaceAuth Project</p>
-        </div>
     </div>
 </body>
 </html>
