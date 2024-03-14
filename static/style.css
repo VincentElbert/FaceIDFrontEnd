@@ -35,22 +35,6 @@ body {
   display: flex;
   flex-direction: column;
 }
-.card {
-  background-color: white;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  text-align: center;
-  width: 400px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.card-title {
-  font-size: 24px;
-  margin-bottom: 20px;
-}
 
 .button {
   margin: 0.5em;
@@ -129,7 +113,7 @@ input[type="submit"]:hover {
   transform: scale(1.02);
 }
 
-.small-card {
+.hint {
   margin-top: 10px;
   padding: 0px 10px;
   background-color: white;
@@ -140,7 +124,7 @@ input[type="submit"]:hover {
   width: 480px;
 }
 
-.small-card .logo {
+.hint .logo {
   width: 20px;
   height: 20px;
   margin-right: 10px;
@@ -271,30 +255,31 @@ input[type="password"] {
   height: 60px;
 }
 
-#popup {
+.popup {
   position: absolute;
-  top: calc(50% - 100px);
-  right: calc(40% - 180px);
-  width: 200px;
+  top: 50%;
+  left: 50%;
+  width: 300px;
+  transform: translate(-50%, -50%);
   background-color: #fff;
   border: 1px solid #ccc;
   border-radius: 5px;
   padding: 10px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   display: none;
-  z-index: 1;
+  z-index: 5;
 }
 
-#popup-content {
+.popup-content {
   text-align: center;
 }
 
-#popup-title {
+.popup-title {
   font-size: 16px;
   margin-bottom: 5px;
 }
 
-#popup-message {
+.popup-message {
   font-size: 14px;
 }
 

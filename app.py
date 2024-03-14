@@ -36,13 +36,13 @@ else:
 
 @app.route('/')
 def index():
-    if 'username' in session:
+    if 'username' in session and session.get('authenticated', True):
         return redirect(url_for('home'))
     return redirect(url_for('login'))
 
 @app.route('/home')
 def home():
-    if 'username' not in session:
+    if 'username' not in session or not session.get('authenticated', False):
         return redirect(url_for('login'))
     return render_template('home.html', username=session['username'])
 
@@ -91,15 +91,17 @@ def faceID():
         result = infer(testFileName)
         if (result != None and result[0] == username):
             print('Face recognized for '+ username)
+            session['authenticated'] = True
             return jsonify({'redirect': url_for('home')})  # Return JSON response with redirect URL
         else:
             print('Face not recognized')
-            return jsonify({'message': 'Face not recognized'})  # Return JSON response with message
+            return jsonify({'message': 'Face not recognized. Please Try Again'})  # Return JSON response with message
     else:
-        return render_template('faceid.html')
+        return render_template('faceid.html', username=session['username'])
 
 @app.route('/logout')
 def logout():
+    session['authenticated'] = False
     session.pop('username', None)
     return redirect(url_for('login'))
 
@@ -144,7 +146,7 @@ def register():
         else:
             message = 'Registration failed.'
         
-        return jsonify(message)
+        return jsonify({'message': message})
     return render_template('register.html')
 
 @app.route('/setup')

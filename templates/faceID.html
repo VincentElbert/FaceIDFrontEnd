@@ -4,44 +4,27 @@
     <title>Face Scanning</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/webcamjs/1.0.26/webcam.min.js"></script>
-    <style>
-      
-      
-      #loading {
-        display: none;
-        margin-top: 20px;
-        font-size: 18px;
-        color: #666;
-      }
-      
-      
-    </style>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   </head>
   <body>
     <img id="logo" src="static/face_defense_master_logo.png" alt="logo"/>
     <div class="container">
-      <h2>Face Scanning Authentication</h2>
-      <div id="webcam-container" style="display: block">
+      <div>
+        <p>Hello <b>{{username}}</b>,<br> Scan your face to verify your identity.</p>
       </div>
-      
-      <div id="loading">Authenticating...</div>
+      <div id="webcam-container">
+      </div>
+      <div id="face-scan-instructions">
+      </div>
     </div>
-    <div id="scan-hint" class="small-card" style="display: flex">
+    <div id="scan-hint" class="hint">
       <img src="static/brightness.png" alt="Brightness" class="logo" />
       <p>Please ensure to have good lighting and a clear background.</p>
     </div>
     <div>
-      <button id="go-back-btn" class="button primary-button">Back</button>
-      <button id="authenticate-btn" class="button primary-button">Authenticate</button>
+      <button id="back-btn" class="button primary-button">Back</button>
+      <button id="scan-btn" class="button primary-button">Scan</button>
     </div>
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        {% for message in messages %}
-          <div class="message">{{ message }}</div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
 
     <script>
       Webcam.set({
@@ -50,37 +33,38 @@
         image_format: 'jpeg',
         jpeg_quality: 90,
         flip_horiz: true // Flip camera horizontally
-      })
+      });
       
-      Webcam.attach('#webcam-container')
+      Webcam.attach('#webcam-container');
+      const faceScanInstructions = document.getElementById("face-scan-instructions");
       
-      $('#authenticate-btn').click(function () {
-        var frames = []
-        $('#loading').show()
+      $('#scan-btn').click(function () {
+        faceScanInstructions.textContent = 'Authenticating...';
+        var frames = [];
         var captureFrame = function () {
           Webcam.snap(function (data_uri) {
-            frames.push(data_uri)
+            frames.push(data_uri);
             if (frames.length < 30) {
-              setTimeout(captureFrame, 100)
+              setTimeout(captureFrame, 100);
             } else {
-              sendFrames(frames)
+              sendFrames(frames);
             }
           })
         }
-        captureFrame()
-      })
+        captureFrame();
+      });
       
-      $('#go-back-btn').click(function () {
+      $('#back-btn').click(function () {
         // Add logic to go back to the previous page or desired location
-        window.history.back()
-      })
+        window.history.back();
+      });
       
       function sendFrames(frames) {
-        var formData = new FormData()
+        var formData = new FormData();
         frames.forEach(function (frame, index) {
-          var blob = dataURItoBlob(frame)
-          formData.append('frame' + index, blob, 'frame' + index + '.jpeg')
-        })
+          var blob = dataURItoBlob(frame);
+          formData.append('frame' + index, blob, 'frame' + index + '.jpeg');
+        });
       
         $.ajax({
           url: '/faceID',
@@ -89,40 +73,39 @@
           processData: false,
           contentType: false,
           success: function (response) {
-            $('#loading').hide()
             if (response.redirect) {
               
-              window.location.href = response.redirect
+              window.location.href = response.redirect;
             } else {
-              showMessage(response.message)
+              showMessage(response.message);
             }
           },
           error: function (xhr, status, error) {
-            $('#loading').hide()
-            console.error(error)
-            showMessage('Authentication failed. Please try again.')
+            console.error(error);
+            showMessage('Error sending to server. Please try again.');
           },
           complete: function () {
             // Reattach the webcam after sending frames to ensure it's available for the next time
-            Webcam.attach('#webcam-container')
+            Webcam.attach('#webcam-container');
           }
-        })
+        });
       }
       
       function dataURItoBlob(dataURI) {
-        var byteString = atob(dataURI.split(',')[1])
-        var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0]
-        var ab = new ArrayBuffer(byteString.length)
-        var ia = new Uint8Array(ab)
+        var byteString = atob(dataURI.split(',')[1]);
+        var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+        var ab = new ArrayBuffer(byteString.length);
+        var ia = new Uint8Array(ab);
         for (var i = 0; i < byteString.length; i++) {
-          ia[i] = byteString.charCodeAt(i)
+          ia[i] = byteString.charCodeAt(i);
         }
-        return new Blob([ab], { type: mimeString })
+        return new Blob([ab], { type: mimeString });
       }
       
       function showMessage(message) {
         // Display the message as desired
-        console.log(message)
+        console.log(message);
+        faceScanInstructions.textContent = message;
       }
     </script>
   </body>

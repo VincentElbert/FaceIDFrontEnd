@@ -4,7 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Register</title>
-    <style></style>
+    <style>
+      #password-error-popup {
+        transform: translate(35%, 5%);
+      }
+    </style>
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename = 'style.css') }}"
@@ -24,10 +28,10 @@
         <div class="form-group">
           <label for="password">Password:</label>
           <input type="password" id="password" name="password" required />
-          <div id="popup" style="display: none">
-            <div id="popup-content">
-              <h2 id="popup-title"></h2>
-              <p id="popup-message"></p>
+          <div id="password-error-popup" class="popup" style="display: none">
+            <div class="popup-content">
+              <h2 class="popup-title">Password Error</h2>
+              <p class="popup-message">Password must be at least 8 characters with a combination of uppercase letters, lowercase letters, numbers, and symbols</p>
             </div>
           </div>
         </div>
@@ -70,7 +74,7 @@
       Already have an account?
       <a href="{{ url_for('login') }}" class="link-button">Login</a>
     </p>
-    <div id="scan-hint" class="small-card" style="display: none">
+    <div id="scan-hint" class="hint" style="display: none">
       <img src="static/brightness.png" alt="Brightness" class="logo" />
       <p>Please ensure to have good lighting and a clear background.</p>
     </div>
@@ -107,6 +111,7 @@
       const verifyPasswordInput = document.getElementById("verify-password");
       const emailError = document.getElementById("email-error");
       const passwordError = document.getElementById("password-error");
+      const passwordErrorPopup = document.getElementById("password-error-popup");
       const webcamContainer = document.getElementById("webcam-container");
       const faceScanInstructions = document.getElementById("face-scan-instructions");
       const loginLink = document.getElementById("login-link");
@@ -128,13 +133,10 @@
         }
 
         if (!isValidPassword(passwordInput.value)) {
-          displayPopup(
-            "Password Error",
-            "Password must be at least 8 characters with a combination of uppercase letters, lowercase letters, numbers, and symbols"
-          );
+          passwordErrorPopup.style.display = "block";
           return;
         } else {
-          popup.style.display = "none";
+          passwordErrorPopup.style.display = "none";
         }
 
         if (passwordInput.value !== verifyPasswordInput.value) {
@@ -167,17 +169,6 @@
         const passwordRegex =
           /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,14}$/;
         return passwordRegex.test(password);
-      }
-
-      function displayPopup(title, message) {
-        const popup = document.getElementById("popup");
-        const popupTitle = document.getElementById("popup-title");
-        const popupMessage = document.getElementById("popup-message");
-
-        popupTitle.textContent = title;
-        popupMessage.textContent = message;
-
-        popup.style.display = "block";
       }
 
       async function startFaceScan() {
