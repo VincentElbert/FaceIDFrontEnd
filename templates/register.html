@@ -19,33 +19,33 @@
     <div class="container">
       <form id="registration-form">
         <h2>Register</h2>
-        <div class="form-group">
           <label for="email">Email:</label>
-          <input type="email" id="email" name="email" required />
+          <input type="email" id="email" name="email" placeholder="Email" required />
 
           <div class="error-message" id="email-error"></div>
-        </div>
-        <div class="form-group">
           <label for="password">Password:</label>
-          <input type="password" id="password" name="password" required />
+          <div style="position: relative;">
+            <input type="password" id="password" name="password" placeholder="Password" required>
+            <span id="toggle-password" class="password-toggle-icon" onclick="togglePasswordVisibility('password')">
+                <img src="static/eye_icon.png" alt="Show Password" class="icon">
+            </span>
+          </div>
           <div id="password-error-popup" class="popup" style="display: none">
             <div class="popup-content">
               <h2 class="popup-title">Password Error</h2>
               <p class="popup-message">Password must be at least 8 characters with a combination of uppercase letters, lowercase letters, numbers, and symbols</p>
             </div>
           </div>
-        </div>
-        <div class="form-group">
           <label for="verify-password">Confirm Password:</label>
-          <input
-            type="password"
-            id="verify-password"
-            name="verify-password"
-            required
-          />
+          <div style="position: relative;">
+            <input type="password" id="verify-password" name="verify-password" placeholder="Confirm Password" required>
+            <span id="toggle-verify-password" class="password-toggle-icon" onclick="togglePasswordVisibility('verify-password')">
+                <img src="static/eye_icon.png" alt="Show Password" class="icon">
+            </span>
+          </div>
           <div class="error-message" id="password-error"></div>
+          <input type="submit" value="Next" />
         </div>
-        <input type="submit" value="Next" />
       </form>
       <div id="webcam-container" style="display: none">
         <div id="face-scan-instructions" style="display: none"></div>
@@ -75,7 +75,7 @@
       <a href="{{ url_for('login') }}" class="link-button">Login</a>
     </p>
     <div id="scan-hint" class="hint" style="display: none">
-      <img src="static/brightness.png" alt="Brightness" class="logo" />
+      <img src="static/brightness.png" alt="Brightness" class="icon" />
       <p>Please ensure to have good lighting and a clear background.</p>
     </div>
     <div class="progress-bar">
@@ -268,6 +268,19 @@
           ia[i] = byteString.charCodeAt(i);
         }
         return new Blob([ab], { type: mimeString });
+      }
+
+      function togglePasswordVisibility(id) {
+        var passwordInput = document.getElementById(id);
+        var toggleIcon = document.getElementById("toggle-" + id);
+
+        if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+            toggleIcon.innerHTML = '<img src="static/eye_icon_hide.png" alt="Hide Password" class="icon">';
+        } else {
+            passwordInput.type = "password";
+            toggleIcon.innerHTML = '<img src="static/eye_icon.png" alt="Show Password" class="icon">';
+        }
       }
     </script>
   </body>

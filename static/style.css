@@ -16,6 +16,10 @@ body {
   text-align: center;
 }
 
+#main-logo {
+    width: 450px !important;
+}
+
 #logo {
   width: 250px;
   height: auto;
@@ -80,13 +84,21 @@ p {
 
 input[type="text"],
 input[type="password"] {
-  width: calc(100% - 20px);
+  width: 100%;
   margin-bottom: 1em;
   padding: 10px;
   border: none;
   border-radius: 5px;
   background-color: rgba(255, 255, 255, 0.8);
   transition: background-color 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
+.password-toggle-icon {
+    position: absolute;
+    top: 45%;
+    right: -10%;
+    transform: translateY(-50%);
+    cursor: pointer;
 }
 
 input[type="text"]:focus,
@@ -97,7 +109,7 @@ input[type="password"]:focus {
 }
 
 input[type="submit"] {
-  width: calc(100% - 20px);
+  width: calc(100% + 20px);
   padding: 10px;
   border: none;
   border-radius: 5px;
@@ -124,16 +136,12 @@ input[type="submit"]:hover {
   width: 480px;
 }
 
-.hint .logo {
+.icon {
   width: 20px;
   height: 20px;
   margin-right: 10px;
 }
 
-.form-group {
-  margin-bottom: 10px;
-  width: 100%;
-}
 .message {
   color: #ff6b6b;
   margin: 1em 0;
