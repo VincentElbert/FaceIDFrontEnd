@@ -19,33 +19,61 @@
     <div class="container">
       <form id="registration-form">
         <h2>Register</h2>
-          <label for="email">Email:</label>
-          <input type="email" id="email" name="email" placeholder="Email" required />
+        <label for="email">Email:</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          placeholder="Email"
+          required
+        />
 
-          <div class="error-message" id="email-error"></div>
-          <label for="password">Password:</label>
-          <div style="position: relative;">
-            <input type="password" id="password" name="password" placeholder="Password" required>
-            <span id="toggle-password" class="password-toggle-icon" onclick="togglePasswordVisibility('password')">
-                <img src="static/eye_icon.png" alt="Show Password" class="icon">
-            </span>
-          </div>
-          <div id="password-error-popup" class="popup" style="display: none">
-            <div class="popup-content">
-              <h2 class="popup-title">Password Error</h2>
-              <p class="popup-message">Password must be at least 8 characters with a combination of uppercase letters, lowercase letters, numbers, and symbols</p>
-            </div>
-          </div>
-          <label for="verify-password">Confirm Password:</label>
-          <div style="position: relative;">
-            <input type="password" id="verify-password" name="verify-password" placeholder="Confirm Password" required>
-            <span id="toggle-verify-password" class="password-toggle-icon" onclick="togglePasswordVisibility('verify-password')">
-                <img src="static/eye_icon.png" alt="Show Password" class="icon">
-            </span>
-          </div>
-          <div class="error-message" id="password-error"></div>
-          <input type="submit" value="Next" />
+        <div class="error-message" id="email-error"></div>
+        <label for="password">Password:</label>
+        <div style="position: relative">
+          <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Password"
+            required
+          />
+          <span
+            id="toggle-password"
+            class="password-toggle-icon"
+            onclick="togglePasswordVisibility('password')"
+          >
+            <img src="static/eye_icon.png" alt="Show Password" class="icon" />
+          </span>
         </div>
+        <div id="password-error-popup" class="popup" style="display: none">
+          <div class="popup-content">
+            <h2 class="popup-title">Password Error</h2>
+            <p class="popup-message">
+              Password must be at least 8 characters with a combination of
+              uppercase letters, lowercase letters, numbers, and symbols
+            </p>
+          </div>
+        </div>
+        <label for="verify-password">Confirm Password:</label>
+        <div style="position: relative">
+          <input
+            type="password"
+            id="verify-password"
+            name="verify-password"
+            placeholder="Confirm Password"
+            required
+          />
+          <span
+            id="toggle-verify-password"
+            class="password-toggle-icon"
+            onclick="togglePasswordVisibility('verify-password')"
+          >
+            <img src="static/eye_icon.png" alt="Show Password" class="icon" />
+          </span>
+        </div>
+        <div class="error-message" id="password-error"></div>
+        <input type="submit" value="Next" />
       </form>
       <div id="webcam-container" style="display: none">
         <div id="face-scan-instructions" style="display: none"></div>
@@ -111,9 +139,13 @@
       const verifyPasswordInput = document.getElementById("verify-password");
       const emailError = document.getElementById("email-error");
       const passwordError = document.getElementById("password-error");
-      const passwordErrorPopup = document.getElementById("password-error-popup");
+      const passwordErrorPopup = document.getElementById(
+        "password-error-popup"
+      );
       const webcamContainer = document.getElementById("webcam-container");
-      const faceScanInstructions = document.getElementById("face-scan-instructions");
+      const faceScanInstructions = document.getElementById(
+        "face-scan-instructions"
+      );
       const loginLink = document.getElementById("login-link");
       const webcam = document.getElementById("webcam");
       const scanHint = document.getElementById("scan-hint");
@@ -275,11 +307,13 @@
         var toggleIcon = document.getElementById("toggle-" + id);
 
         if (passwordInput.type === "password") {
-            passwordInput.type = "text";
-            toggleIcon.innerHTML = '<img src="static/eye_icon_hide.png" alt="Hide Password" class="icon">';
+          passwordInput.type = "text";
+          toggleIcon.innerHTML =
+            '<img src="static/eye_icon_hide.png" alt="Hide Password" class="icon">';
         } else {
-            passwordInput.type = "password";
-            toggleIcon.innerHTML = '<img src="static/eye_icon.png" alt="Show Password" class="icon">';
+          passwordInput.type = "password";
+          toggleIcon.innerHTML =
+            '<img src="static/eye_icon.png" alt="Show Password" class="icon">';
         }
       }
     </script>
