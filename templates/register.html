@@ -4,6 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Register</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/webcamjs/1.0.26/webcam.min.js"></script>
     <style>
       #password-error-popup {
         transform: translate(35%, 5%);
@@ -76,14 +78,8 @@
         <input type="submit" value="Next" />
       </form>
       <div id="webcam-container" style="display: none">
-        <div id="face-scan-instructions" style="display: none"></div>
-        <video
-          id="webcam"
-          width="350"
-          height="auto"
-          autoplay
-          style="transform: scaleX(-1)"
-        ></video>
+        <div id="face-scan-instructions"></div>
+        <div id="webcam"></div>
         <img
           id="face-frame"
           src="static/face_frame.png"
@@ -181,9 +177,7 @@
         registrationForm.style.display = "none";
         loginLink.style.display = "none";
         webcamContainer.style.display = "block";
-        faceScanInstructions.style.display = "block";
         scanBtn.style.display = "block";
-        faceScanInstructions.style.display = "block";
         scanHint.style.display = "flex";
         progressBar[0].style.display = "block";
         progressBar[1].style.display = "block";
@@ -191,6 +185,87 @@
 
         startFaceScan();
       });
+
+      async function startFaceScan() {
+        Webcam.set({
+          width: 400,
+          height: 240,
+          image_format: 'jpeg',
+          jpeg_quality: 90,
+          flip_horiz: true // Flip camera horizontally
+        });
+        Webcam.attach('#webcam');
+
+        const faceScanSteps = [
+          "Position your face directly in front of the camera and align it in the centre of the frame.",
+          "Turn your head to the right and align your face within the frame",
+          "Turn your head to the left and align your face within the frame",
+        ];
+        const faceImages = [];
+
+        index = 0;
+        for (const step of faceScanSteps) {
+          count = 0;
+          faceScanInstructions.textContent = step;
+          scanBtn.disabled = false;
+
+          if (step == faceScanSteps[1]) {
+            arrow.style.display = "block";
+          } else if (step == faceScanSteps[2]) {
+            arrow.style.transform = "translate(-50%, -70%) scaleX(-1)";
+          }
+
+          progressBar[index]
+            .querySelector(".progress-bar-inner")
+            .classList.add("active");
+          
+          await new Promise((resolve) => {
+            scanBtn.onclick = () => {
+              scanBtn.disabled = true;
+
+              faceScanInstructions.textContent = "Processing...";
+
+              const captureImages = () => {
+                Webcam.snap(function (data_uri) {
+                  faceImages.push(data_uri);
+                  if (count < 15) {
+                    count++
+                    setTimeout(captureImages, 100);
+                  } else {
+                    resolve(); 
+                  }
+                })
+              };
+              captureImages();
+            };
+          });
+          index++;
+        }
+
+        const formData = new FormData();
+        formData.append("email", emailInput.value);
+        formData.append("password", passwordInput.value);
+        faceImages.forEach((frame, index) => {
+          var blob = dataURItoBlob(frame)
+          formData.append(
+            `faceImages_${index}`,
+            blob,
+            `faceImage_${index}.jpg`
+          );
+        });
+
+        const response = await fetch("/register", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (response.ok) {
+          alert("Registration successful!");
+          window.location.href = "/login";
+        } else {
+          alert("Registration failed. Please try again.");
+        }
+      }
 
       function isValidEmail(email) {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -201,94 +276,6 @@
         const passwordRegex =
           /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,14}$/;
         return passwordRegex.test(password);
-      }
-
-      async function startFaceScan() {
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({
-            video: { facingMode: "environment" },
-          });
-
-          /* faceFrame.style.display = "block"; */
-          webcam.srcObject = stream;
-
-          const faceScanSteps = [
-            "Position your face directly in front of the camera and align it in the centre of the frame.",
-            "Turn your head to the right and align your face within the frame",
-            "Turn your head to the left and align your face within the frame",
-          ];
-          const faceImages = [];
-
-          index = 0;
-          for (const step of faceScanSteps) {
-            count = 0;
-            faceScanInstructions.textContent = step;
-            scanBtn.disabled = false;
-
-            if (step == faceScanSteps[1]) {
-              arrow.style.display = "block";
-            } else if (step == faceScanSteps[2]) {
-              arrow.style.transform = "translate(-50%, -70%) scaleX(-1)";
-            }
-
-            progressBar[index]
-              .querySelector(".progress-bar-inner")
-              .classList.add("active");
-            await new Promise((resolve) => {
-              scanBtn.onclick = () => {
-                scanBtn.disabled = true;
-
-                faceScanInstructions.textContent = "Processing...";
-                const captureImages = () => {
-                  if (count < 15) {
-                    const canvas = document.createElement("canvas");
-                    canvas.width = webcam.videoWidth;
-                    canvas.height = webcam.videoHeight;
-                    canvas
-                      .getContext("2d")
-                      .drawImage(webcam, 0, 0, canvas.width, canvas.height);
-                    const imageData = canvas.toDataURL("image/jpeg");
-                    faceImages.push(dataURItoBlob(imageData));
-                    count++;
-                    setTimeout(captureImages, 200); // Capture image every 200ms
-                  } else {
-                    resolve();
-                  }
-                };
-                captureImages();
-              };
-            });
-            index++;
-          }
-
-          const formData = new FormData();
-          formData.append("email", emailInput.value);
-          formData.append("password", passwordInput.value);
-          faceImages.forEach((file, index) => {
-            formData.append(
-              `faceImages_${index}`,
-              file,
-              `faceImage_${index}.jpg`
-            );
-          });
-
-          const response = await fetch("/register", {
-            method: "POST",
-            body: formData,
-          });
-
-          if (response.ok) {
-            alert("Registration successful!");
-            window.location.href = "/login";
-          } else {
-            alert("Registration failed. Please try again.");
-          }
-        } catch (error) {
-          console.error("Error during face scan:", error);
-          alert("An error occurred during face scan. Please try again.");
-        } finally {
-          webcam.srcObject.getTracks().forEach((track) => track.stop());
-        }
       }
 
       function dataURItoBlob(dataURI) {

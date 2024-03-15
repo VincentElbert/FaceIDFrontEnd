@@ -9,12 +9,12 @@
   <body>
     <img id="logo" src="static/face_defense_master_logo.png" alt="logo"/>
     <div class="container">
-      <div>
-        <p>Hello <b>{{username}}</b>,<br> Scan your face to verify your identity.</p>
-      </div>
       <div id="webcam-container">
-      </div>
-      <div id="face-scan-instructions">
+        <div>
+          <p>Hello <b>{{username}}</b>,<br> Scan your face to verify your identity.</p>
+        </div>
+        <div id="webcam"></div>
+        <div id="face-scan-instructions"></div>
       </div>
     </div>
     <div id="scan-hint" class="hint">
@@ -27,17 +27,16 @@
     </div>
 
     <script>
+      const faceScanInstructions = document.getElementById("face-scan-instructions");
       Webcam.set({
-        width: 320,
+        width: 400,
         height: 240,
         image_format: 'jpeg',
         jpeg_quality: 90,
         flip_horiz: true // Flip camera horizontally
       });
-      
-      Webcam.attach('#webcam-container');
-      const faceScanInstructions = document.getElementById("face-scan-instructions");
-      
+      Webcam.attach('#webcam');
+
       $('#scan-btn').click(function () {
         faceScanInstructions.textContent = 'Authenticating...';
         var frames = [];
@@ -47,7 +46,7 @@
             if (frames.length < 30) {
               setTimeout(captureFrame, 100);
             } else {
-              sendFrames(frames);
+              sendFrames(frames); 
             }
           })
         }
@@ -63,7 +62,7 @@
         var formData = new FormData();
         frames.forEach(function (frame, index) {
           var blob = dataURItoBlob(frame);
-          formData.append('frame' + index, blob, 'frame' + index + '.jpeg');
+          formData.append('frame_' + index, blob, 'frame_' + index + '.jpeg');
         });
       
         $.ajax({
@@ -86,7 +85,7 @@
           },
           complete: function () {
             // Reattach the webcam after sending frames to ensure it's available for the next time
-            Webcam.attach('#webcam-container');
+            Webcam.attach('#webcam');
           }
         });
       }

@@ -73,7 +73,7 @@ def faceID():
         frames = []
         testFileName = "" # Temporary solution, should be changed
         for i in range(len(request.files)):
-            frame = request.files['frame' + str(i)]
+            frame = request.files['frame_' + str(i)]
             filename = secure_filename(frame.filename)
             
             # Generate a unique filename with timestamp
