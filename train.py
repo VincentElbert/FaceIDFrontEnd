@@ -13,6 +13,8 @@ def train(encodingpath):
     # Load from text
     with open(encodingpath, "r") as file:
         for line in file:
+            if len(line.split(":", 1)) < 2 :
+                continue
             name, encodingTxtCommaSeparated = line.split(":", 1)
             names.append(name)
             encodingTxt = encodingTxtCommaSeparated.split(",")
