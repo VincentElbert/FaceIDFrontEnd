@@ -22,6 +22,7 @@ COPY train.py .
 FROM python:3.12 AS run
 COPY --from=dependency /root/.local /root/.local
 ENV PATH=/root/.local/bin:$PATH
+ENV SERVER_PORT=443
 WORKDIR /app
 COPY --from=dependency /app .
 CMD ["python","app.py"]

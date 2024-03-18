@@ -26,7 +26,7 @@ UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'resour
 ENCODINGS_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'resources', 'encodings.txt')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['ENCODINGS_PATH'] = ENCODINGS_PATH
-app.config['SERVER_PORT'] = os.getenv('SERVER_PORT', 5000) # Default to 5000 if not set
+app.config['SERVER_PORT'] = int(os.getenv('SERVER_PORT', 5000)) # Default to 5000 if not set
 
 # Generate model using encodings
 if not os.path.exists(app.config['ENCODINGS_PATH']):
