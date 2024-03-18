@@ -26,6 +26,7 @@ UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'resour
 ENCODINGS_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'resources', 'encodings.txt')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['ENCODINGS_PATH'] = ENCODINGS_PATH
+app.config['SERVER_PORT'] = os.getenv('SERVER_PORT', 5000) # Default to 5000 if not set
 
 # Generate model using encodings
 if not os.path.exists(app.config['ENCODINGS_PATH']):
@@ -97,7 +98,7 @@ def faceID():
             print('Face not recognized')
             return jsonify({'message': 'Face not recognized. Please Try Again'})  # Return JSON response with message
     else:
-        return render_template('faceid.html', username=session['username'])
+        return render_template('faceID.html', username=session['username'])
 
 @app.route('/logout')
 def logout():
@@ -168,5 +169,5 @@ def process_scans():
 # ... other route definitions ...
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=app.config['SERVER_PORT'], ssl_context='adhoc')
 
