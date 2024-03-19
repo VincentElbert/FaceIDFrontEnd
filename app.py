@@ -9,6 +9,7 @@ from datetime import datetime
 from inference import infer, loginInfer
 from face_to_encoding import encodeSet, encodeByPerson, checkValidCamInput
 from train import train
+from models import db, User
 
 app = Flask(__name__)
 
@@ -27,6 +28,24 @@ ENCODINGS_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'resou
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['ENCODINGS_PATH'] = ENCODINGS_PATH
 app.config['SERVER_PORT'] = int(os.getenv('SERVER_PORT', 5000)) # Default to 5000 if not set
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///project.db"
+
+app.app_context().push()
+db.init_app(app)
+# Create tables if they do not exist already
+db.drop_all()
+db.create_all()
+
+for user in user_info.keys():
+    new_user = User(
+        email=user,
+        password=user_info.get(user),
+    )
+    db.session.add(new_user)
+    db.session.commit()
+
+print(db.session.execute(db.select(User).filter_by(email="admin")).scalar_one().email)
+
 
 # Generate model using encodings
 if not os.path.exists(app.config['ENCODINGS_PATH']):
