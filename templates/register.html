@@ -77,8 +77,8 @@
         <div class="error-message" id="password-error"></div>
         <input type="submit" value="Next" />
       </form>
+      <div id="face-scan-instructions"></div>
       <div id="webcam-container" style="display: none">
-        <div id="face-scan-instructions"></div>
         <div id="webcam"></div>
         <img
           id="face-frame"
@@ -176,7 +176,7 @@
 
         registrationForm.style.display = "none";
         loginLink.style.display = "none";
-        webcamContainer.style.display = "block";
+        webcamContainer.style.display = "flex";
         scanBtn.style.display = "block";
         scanHint.style.display = "flex";
         progressBar[0].style.display = "block";
@@ -189,7 +189,7 @@
       async function startFaceScan() {
         Webcam.set({
           width: 400,
-          height: 240,
+          height: 300,
           image_format: 'jpeg',
           jpeg_quality: 90,
           flip_horiz: true // Flip camera horizontally
@@ -227,13 +227,26 @@
 
               const captureImages = () => {
                 Webcam.snap(function (data_uri) {
-                  faceImages.push(data_uri);
-                  if (count < 15) {
-                    count++
-                    setTimeout(captureImages, 100);
-                  } else {
-                    resolve(); 
-                  }
+                  var img = new Image();
+                  img.onload = function () {
+                    var canvas = document.createElement('canvas');
+                    canvas.width = 200; // Width of the center region to extract
+                    canvas.height = img.height;
+
+                    var ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, (img.width - canvas.width) / 2, 0, canvas.width, canvas.height, 0, 0, canvas.width, canvas.height);
+
+                    canvas.toBlob(function (blob) {
+                      faceImages.push(blob);
+                      if (count < 15) {
+                        count++
+                        setTimeout(captureImages, 0);
+                      } else {
+                        resolve(); 
+                      }
+                    }, 'image/jpeg', 1.0);
+                  };
+                  img.src = data_uri;
                 })
               };
               captureImages();
@@ -246,10 +259,9 @@
         formData.append("email", emailInput.value);
         formData.append("password", passwordInput.value);
         faceImages.forEach((frame, index) => {
-          var blob = dataURItoBlob(frame)
           formData.append(
             `faceImages_${index}`,
-            blob,
+            frame,
             `faceImage_${index}.jpg`
           );
         });
@@ -276,17 +288,6 @@
         const passwordRegex =
           /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,14}$/;
         return passwordRegex.test(password);
-      }
-
-      function dataURItoBlob(dataURI) {
-        const byteString = atob(dataURI.split(",")[1]);
-        const mimeString = dataURI.split(",")[0].split(":")[1].split(";")[0];
-        const ab = new ArrayBuffer(byteString.length);
-        const ia = new Uint8Array(ab);
-        for (let i = 0; i < byteString.length; i++) {
-          ia[i] = byteString.charCodeAt(i);
-        }
-        return new Blob([ab], { type: mimeString });
       }
 
       function togglePasswordVisibility(id) {

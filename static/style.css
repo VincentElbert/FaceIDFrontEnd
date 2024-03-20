@@ -82,8 +82,13 @@ h2:hover {
 }
 
 p {
-  margin-bottom: 5px;
   font-size: 14px;
+}
+
+ol {
+  margin: 0px;
+  font-size: 14px;
+  text-align: left;
 }
 
 input[type="text"],
@@ -232,7 +237,7 @@ input[type="password"] {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: 400px;
+  width: 200px;
   height: auto;
   position: relative;
 }
