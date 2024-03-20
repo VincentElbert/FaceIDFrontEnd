@@ -9,17 +9,16 @@
   <body>
     <img id="logo" src="static/face_defense_master_logo.png" alt="logo"/>
     <div class="container">
+      <div id="face-scan-instructions">
+        <p>Hello <b>{{username}}</b>,<br> Scan your face to verify your identity.</p>
+      </div>
       <div id="webcam-container">
-        <div>
-          <p>Hello <b>{{username}}</b>,<br> Scan your face to verify your identity.</p>
-        </div>
         <div id="webcam"></div>
-        <div id="face-scan-instructions"></div>
       </div>
     </div>
     <div id="scan-hint" class="hint">
       <img src="static/brightness.png" alt="Brightness" class="icon" />
-      <p>Please ensure to have good lighting and a clear background.</p>
+      Please ensure to have good lighting and a clear background.
     </div>
     <div>
       <button id="back-btn" class="button primary-button">Back</button>
@@ -30,7 +29,7 @@
       const faceScanInstructions = document.getElementById("face-scan-instructions");
       Webcam.set({
         width: 400,
-        height: 240,
+        height: 300,
         image_format: 'jpeg',
         jpeg_quality: 90,
         flip_horiz: true // Flip camera horizontally
@@ -42,14 +41,27 @@
         var frames = [];
         var captureFrame = function () {
           Webcam.snap(function (data_uri) {
-            frames.push(data_uri);
-            if (frames.length < 30) {
-              setTimeout(captureFrame, 100);
-            } else {
-              sendFrames(frames); 
-            }
-          })
-        }
+            var img = new Image();
+            img.onload = function () {
+              var canvas = document.createElement('canvas');
+              canvas.width = 200; // Width of the center region to extract
+              canvas.height = img.height;
+
+              var ctx = canvas.getContext('2d');
+              ctx.drawImage(img, (img.width - canvas.width) / 2, 0, canvas.width, canvas.height, 0, 0, canvas.width, canvas.height);
+
+              canvas.toBlob(function (blob) {
+                frames.push(blob);
+                if (frames.length < 30) {
+                  setTimeout(captureFrame, 0);
+                } else {
+                  sendFrames(frames);
+                }
+              }, 'image/jpeg', 1.0);
+            };
+            img.src = data_uri;
+          });
+        };
         captureFrame();
       });
       
@@ -61,8 +73,7 @@
       function sendFrames(frames) {
         var formData = new FormData();
         frames.forEach(function (frame, index) {
-          var blob = dataURItoBlob(frame);
-          formData.append('frame_' + index, blob, 'frame_' + index + '.jpeg');
+          formData.append('frame_' + index, frame, 'frame_' + index + '.jpeg');
         });
       
         $.ajax({
@@ -88,17 +99,6 @@
             Webcam.attach('#webcam');
           }
         });
-      }
-      
-      function dataURItoBlob(dataURI) {
-        var byteString = atob(dataURI.split(',')[1]);
-        var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
-        var ab = new ArrayBuffer(byteString.length);
-        var ia = new Uint8Array(ab);
-        for (var i = 0; i < byteString.length; i++) {
-          ia[i] = byteString.charCodeAt(i);
-        }
-        return new Blob([ab], { type: mimeString });
       }
       
       function showMessage(message) {

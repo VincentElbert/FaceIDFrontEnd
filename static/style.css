@@ -82,8 +82,13 @@ h2:hover {
 }
 
 p {
-  margin-bottom: 5px;
   font-size: 14px;
+}
+
+ol {
+  margin: 0px;
+  font-size: 14px;
+  text-align: left;
 }
 
 input[type="text"],
@@ -130,8 +135,11 @@ input[type="submit"]:hover {
 }
 
 .hint {
+  font-size: 12px;
+  color: #888;
+  text-align: left;
   margin-top: 10px;
-  padding: 0px 10px;
+  padding: 5px 0px;
   background-color: white;
   display: flex;
   align-items: center;
@@ -203,13 +211,6 @@ input[type="submit"]:hover {
   color: #ff6b6b;
 }
 
-.hint {
-  font-size: 12px;
-  color: #888;
-
-  text-align: left;
-}
-
 input[type="email"],
 input[type="password"] {
   width: 100%;
@@ -232,7 +233,7 @@ input[type="password"] {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: 400px;
+  width: 200px;
   height: auto;
   position: relative;
 }
