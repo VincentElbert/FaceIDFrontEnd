@@ -135,8 +135,11 @@ input[type="submit"]:hover {
 }
 
 .hint {
+  font-size: 12px;
+  color: #888;
+  text-align: left;
   margin-top: 10px;
-  padding: 0px 10px;
+  padding: 5px 0px;
   background-color: white;
   display: flex;
   align-items: center;
@@ -206,13 +209,6 @@ input[type="submit"]:hover {
 
 .footer:hover {
   color: #ff6b6b;
-}
-
-.hint {
-  font-size: 12px;
-  color: #888;
-
-  text-align: left;
 }
 
 input[type="email"],
