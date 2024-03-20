@@ -4,12 +4,14 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 import os
+import ipinfo
+from user_agents import parse
 from datetime import datetime
 # from camera import capture_and_upload_frames
 from inference import infer, loginInfer
 from face_to_encoding import encodeSet, encodeByPerson, checkValidCamInput
 from train import train
-from models import db, User
+from models import db, User, Connection, LogEvent
 
 app = Flask(__name__)
 
@@ -37,14 +39,14 @@ db.drop_all()
 db.create_all()
 
 for user in user_info.keys():
-    new_user = User(
+    test_user = User(
         email=user,
         password=user_info.get(user),
     )
-    db.session.add(new_user)
+    db.session.add(test_user)
     db.session.commit()
 
-print(db.session.execute(db.select(User).filter_by(email="admin")).scalar_one().email)
+print(db.session.execute(db.select(User).filter_by(email="admin")).scalar_one().connections)
 
 
 # Generate model using encodings
@@ -72,8 +74,9 @@ def login():
         username = request.form['username']
         password = request.form['password']
 
-        if username in user_info.keys():
-            if check_password_hash(user_info[username], password):
+        if db.session.query(User.email).filter_by(email=username).scalar() is not None:
+            hashed_pw = db.session.execute(db.select(User).filter_by(email=username)).scalar_one().password
+            if check_password_hash(hashed_pw, password):
                 session['username'] = username
                 return redirect(url_for('faceID'))
             else:
@@ -130,6 +133,8 @@ def register():
     if request.method == 'POST':
         email = request.form.get('email')
         password = request.form.get('password')
+        user_agent = parse(request.user_agent.string)
+        ip = request.remote_addr
         # Store the registration data in the user_info dictionary
         user_info[email] = generate_password_hash(password)
 
@@ -159,6 +164,18 @@ def register():
 
                 if success:
                     message = 'Registration successful!'
+                    new_user = User(
+                        email=email,
+                        password=generate_password_hash(password),
+                    )
+                    new_user_connection = Connection(
+                        device=str(user_agent).split(' / ')[0],
+                    )
+                    new_user.connections.append(new_user_connection)
+                    db.session.add(new_user)
+                    db.session.add(new_user_connection)
+                    db.session.commit()
+
                 else:
                     message = 'Registration failed.'
             else:
