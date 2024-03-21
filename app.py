@@ -150,7 +150,9 @@ def logout():
 def register():
     if request.method == 'POST':
         email = request.form.get('email')
+        global password
         password = request.form.get('password')
+        global user_agent
         user_agent = parse(request.user_agent.string)
         verification_code = generate_verification_code()
         global email_waitfor_verify 
@@ -184,17 +186,7 @@ def register():
                     print("User info after registration:")
                     print(user_info)
                     print(email)
-                    new_user = User(
-                        email=email,
-                        password=generate_password_hash(password),
-                    )
-                    new_user_connection = Connection(
-                        device=str(user_agent).split(' / ')[0],
-                    )
-                    new_user.connections.append(new_user_connection)
-                    db.session.add(new_user)
-                    db.session.add(new_user_connection)
-                    db.session.commit()
+
 
                     return jsonify({'message': 'Registration successful!'})
                 else:
@@ -245,6 +237,17 @@ def verification():
                 # Verification code is correct
                 # Mark the email as verified in the user_info dictionary or your database
                 user_info[email]['verified'] = True
+                new_user = User(
+                    email=email,
+                    password=generate_password_hash(password),
+                )
+                new_user_connection = Connection(
+                    device=str(user_agent).split(' / ')[0],
+                )
+                new_user.connections.append(new_user_connection)
+                db.session.add(new_user)
+                db.session.add(new_user_connection)
+                db.session.commit()
                 
                 return {'success': True}
             else:
