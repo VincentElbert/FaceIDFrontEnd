@@ -83,6 +83,7 @@ def home():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    session.pop('username', None)
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
@@ -101,30 +102,34 @@ def login():
 
 @app.route('/faceID', methods=['GET','POST'])
 def faceID():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    session['authenticated'] = False
     if request.method == 'POST':
         if 'username' not in session:
             return redirect(url_for('login'))
         username = session['username']
 
         frames = []
-        testFileName = "" # Temporary solution, should be changed
+        # testFileName = "" # Temporary solution, should be changed
         for i in range(len(request.files)):
             frame = request.files['frame_' + str(i)]
-            filename = secure_filename(frame.filename)
+            # filename = secure_filename(frame.filename)
             
-            # Generate a unique filename with timestamp
-            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-            filename = f"{timestamp}_{filename}"
+            ## Generate a unique filename with timestamp
+            # timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+            # filename = f"{timestamp}_{filename}"
             
-            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            with open(filepath, 'wb') as file:
-                file.write(frame.read())
+            # filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            # with open(filepath, 'wb') as file:
+            #    file.write(frame.read())
             frames.append(frame)
 
-            testFileName = filepath # Temporary solution, should be changed
-       
+            # testFileName = filepath # Temporary solution, should be changed
+    
         # For demonstration assumin authentication is successful
-        result = infer(testFileName)
+        # result = infer(testFileName)
+        result = infer(frames[0].stream)
         if (result != None and result[0] == username):
             print('Face recognized for '+ username)
             session['authenticated'] = True
@@ -202,13 +207,9 @@ def register():
                     db.session.commit()
                     return redirect(url_for('verification', email=email))
                 else:
-                    message = 'Registration failed.'
-            else:
-                message = 'Registration failed.'
+                    return jsonify({'message': 'Registration failed.'})
         else:
-            message = 'Registration failed.'
-        
-        return jsonify({'message': message})
+            return jsonify({'message': 'Registration failed.'})
     return render_template('register.html')
 
 @app.route('/setup')
