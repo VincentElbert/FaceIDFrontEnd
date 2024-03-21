@@ -7,11 +7,9 @@ import os
 from datetime import datetime
 # from camera import capture_and_upload_frames
 from inference import infer, loginInfer
-from face_to_encoding import encodeSet, encodeByPerson, checkValidCamInput, checkFace
+from face_to_encoding import encodeSet, encodeByPerson, checkValidCamInput
 from train import train
 from models import db, User
-from PIL import Image
-import numpy as np
 
 app = Flask(__name__)
 
@@ -146,23 +144,23 @@ def register():
                 for index in range(len(request.files)):
                     if f'faceImages_{index}' in request.files:
                         person_img = request.files[f'faceImages_{index}']
-                        img = Image.open(person_img)
-                        img_arr = np.array(img)
-                        if checkFace(img_arr):
-                            encodingLine = encodeByPerson(img_arr)
-                            if encodingLine:
-                                encodings.append(encodingLine)
-                with open(app.config['ENCODINGS_PATH'], "a") as file:
-                    file.write("\n" + email + ''.join(encodings))
-                train(app.config['ENCODINGS_PATH'])
-                message = 'Registration successful!'
+                        encodingLine = encodeByPerson(person_img)
+                        if encodingLine:
+                            encodings.append(encodingLine)
+
+                if encodings:
+                    with open(app.config['ENCODINGS_PATH'], "a") as file:
+                        file.write("\n".join([email + encoding for encoding in encodings]))
+                    train(app.config['ENCODINGS_PATH'])
+
+                    return jsonify({'message': 'Registration successful!'})
+                else:
+                    return jsonify({'message': 'Registration failed.'})
             except Exception as e:
                 print(f"Error during registration: {str(e)}")
-                message = 'Registration failed.'
+                return jsonify({'message': 'Registration failed.'})
         else:
-            message = 'Registration failed.'
-        
-        return jsonify({'message': message})
+            return jsonify({'message': 'Registration failed.'})
     return render_template('register.html')
 
 @app.route('/setup')

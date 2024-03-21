@@ -1,3 +1,5 @@
+from PIL import Image
+import numpy as np
 import face_recognition
 import os
 
@@ -17,8 +19,11 @@ def encodeSet(imgpath, txtpath):
 
 def encodeByPerson(imgpath):
     # Get the face encodings for the face in each image file
-    encoding = face_recognition.face_encodings(imgpath)[0]
-    return  ":" + ",".join(str(val) for val in encoding)
+    img = Image.open(imgpath)
+    img_arr = np.array(img)
+    if checkFace(img_arr):
+        encoding = face_recognition.face_encodings(img_arr)[0]
+        return  ":" + ",".join(str(val) for val in encoding)
 
 def checkFace(imgpath):
     face_bounding_boxes = face_recognition.face_locations(imgpath)
