@@ -12,8 +12,16 @@ from inference import infer, loginInfer
 from face_to_encoding import encodeSet, encodeByPerson, checkValidCamInput
 from train import train
 from models import db, User, Connection, LogEvent
+import random
+from flask_mail import Mail, Message
 
 app = Flask(__name__)
+app.config['MAIL_SERVER'] = 'smtp.fastmail.com'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
+app.config['MAIL_USERNAME'] = 'team1test@fastmail.com'
+app.config['MAIL_PASSWORD'] = '85jj5xcqfy3ypk3q'
 
 # Secret key for sessions
 app.secret_key = 'test'
@@ -24,6 +32,8 @@ user_info = {
     "admin" : generate_password_hash("password123"),  #temp, should not Never store passwords in plain text
     "Justin_Sun": generate_password_hash("password123"),
 }
+
+mail = Mail(app)
 
 UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'resources', 'image')
 ENCODINGS_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'resources', 'encodings.txt')
@@ -55,6 +65,9 @@ if not os.path.exists(app.config['ENCODINGS_PATH']):
     train(app.config['ENCODINGS_PATH'])
 else:
     train(app.config['ENCODINGS_PATH'])
+
+def generate_verification_code():
+    return str(random.randint(100000, 999999))
 
 @app.route('/')
 def index():
@@ -134,9 +147,15 @@ def register():
         email = request.form.get('email')
         password = request.form.get('password')
         user_agent = parse(request.user_agent.string)
+        verification_code = generate_verification_code()
+        global email_waitfor_verify 
+        email_waitfor_verify = email
         ip = request.remote_addr
         # Store the registration data in the user_info dictionary
-        user_info[email] = generate_password_hash(password)
+        user_info[email] = {
+            'password': generate_password_hash(password),
+            'verification_code': verification_code
+        }
 
         frames = []
         index = 0
@@ -163,7 +182,13 @@ def register():
                 train(app.config['ENCODINGS_PATH'])
 
                 if success:
-                    message = 'Registration successful!'
+                    email_string = "Thank you for registering! Please enter the following code to activate your account: " + str(verification_code)
+                    msg = Message('Registration Confirmation', sender='team1test@fastmail.com', recipients=[email])
+                    msg.body = email_string
+                    mail.send(msg)
+                    print("User info after registration:")
+                    print(user_info)
+                    print(email)
                     new_user = User(
                         email=email,
                         password=generate_password_hash(password),
@@ -175,7 +200,7 @@ def register():
                     db.session.add(new_user)
                     db.session.add(new_user_connection)
                     db.session.commit()
-
+                    return redirect(url_for('verification', email=email))
                 else:
                     message = 'Registration failed.'
             else:
@@ -201,6 +226,41 @@ def process_scans():
     
     #  might want to implement actual success checking logic based on processing
     return jsonify({'success': True})
+
+@app.route('/verification', methods=['GET', 'POST'])
+def verification():
+    if request.method == 'POST':
+        data = request.get_json()
+        email = email_waitfor_verify
+        #email = data.get('email')
+        verification_code = data.get('verification_code')
+
+        print(data)
+        print("User info after registration:")
+        print(user_info)
+        print("The email-------------------------------------")
+        print(email)
+        print("The email-------------------------------------")
+        print("The verification_code-------------------------------------")
+        print(verification_code)
+        print("The verification_code-------------------------------------")
+
+        if email in user_info:
+            if user_info[email]['verification_code'] == verification_code:
+                # Verification code is correct
+                # Mark the email as verified in the user_info dictionary or your database
+                user_info[email]['verified'] = True
+                
+                return {'success': True}
+            else:
+                # Verification code is incorrect
+                return {'success': False, 'message': 'Invalid verification code. Please try again.'}
+        else:
+            # Invalid email
+            return {'success': False, 'message': 'Email is missing'}
+    else:
+        email = request.args.get('email')
+        return render_template('verification.html', email=email)
 
 # ... other route definitions ...
 
