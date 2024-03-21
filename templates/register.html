@@ -185,7 +185,7 @@
 
         startFaceScan();
       });
-
+      
       async function startFaceScan() {
         Webcam.set({
           width: 400,
@@ -195,7 +195,7 @@
           flip_horiz: true // Flip camera horizontally
         });
         Webcam.attach('#webcam');
-
+        
         const faceScanSteps = [
           "Position your face directly in front of the camera and align it in the centre of the frame.",
           "Turn your head to the right and align your face within the frame",
@@ -244,7 +244,7 @@
                       } else {
                         resolve(); 
                       }
-                    }, 'image/jpeg', 1.0);
+                    }, 'image/jpeg', 0.7);
                   };
                   img.src = data_uri;
                 })

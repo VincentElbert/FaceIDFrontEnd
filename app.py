@@ -12,6 +12,7 @@ from inference import infer, loginInfer
 from face_to_encoding import encodeSet, encodeByPerson, checkValidCamInput
 from train import train
 from models import db, User, Connection, LogEvent
+from multiprocessing import Pool
 
 app = Flask(__name__)
 
@@ -98,24 +99,9 @@ def faceID():
         username = session['username']
 
         frames = []
-        # testFileName = "" # Temporary solution, should be changed
         for i in range(len(request.files)):
             frame = request.files['frame_' + str(i)]
-            # filename = secure_filename(frame.filename)
-            
-            ## Generate a unique filename with timestamp
-            # timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-            # filename = f"{timestamp}_{filename}"
-            
-            # filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            # with open(filepath, 'wb') as file:
-            #    file.write(frame.read())
             frames.append(frame)
-
-            # testFileName = filepath # Temporary solution, should be changed
-    
-        # For demonstration assumin authentication is successful
-        # result = infer(testFileName)
         result = infer(frames[0].stream)
         if (result != None and result[0] == username):
             print('Face recognized for '+ username)
@@ -146,12 +132,14 @@ def register():
         if email and password and request.files:
             try:
                 encodings = []
-                for index in range(len(request.files)):
-                    if f'faceImages_{index}' in request.files:
-                        person_img = request.files[f'faceImages_{index}']
-                        encodingLine = encodeByPerson(person_img)
-                        if encodingLine:
-                            encodings.append(encodingLine)
+                num_processes = len(request.files)  # Number of concurrent processes
+
+                with Pool(processes=num_processes) as pool:
+                    results = pool.map(encodeByPerson, [request.files[f'faceImages_{index}'] for index in range(num_processes)])
+
+                for encodingLine in results:
+                    if encodingLine:
+                        encodings.append(encodingLine)
 
                 if encodings:
                     with open(app.config['ENCODINGS_PATH'], "a") as file:
@@ -183,20 +171,6 @@ def register():
 @app.route('/setup')
 def setup():
     return render_template('setup.html')
-
-@app.route('/process_scans', methods=['POST'])
-def process_scans():
-    scans = request.json
-    # Process the scan data
-    for step, image_data in scans.items():
-        # TODO: Process each image_data, for example, save to a file or a database
-        print(f"Received scan for {step}")
-
-    
-    #  might want to implement actual success checking logic based on processing
-    return jsonify({'success': True})
-
-# ... other route definitions ...
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=app.config['SERVER_PORT'], ssl_context='adhoc')
