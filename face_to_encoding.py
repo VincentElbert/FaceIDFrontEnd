@@ -1,57 +1,32 @@
 import face_recognition
 import os
 
-
-def encodingToLine(name, encoding):
-    line = name + ":"
-    for i in range(len(encoding)):
-        line += str(encoding[i])
-        if i < len(encoding) - 1:
-            line += ","
-    return line + "\n"
-
 def encodeSet(imgpath, txtpath):
 
     train_dir = os.listdir(imgpath)
-
+    
     # Loop through each person in the training directory
     for person in train_dir:
+        file = open(txtpath, "a")
+        for person_img in person:
+            encodingLine = encodeByPerson(person_img)
+            if encodingLine:
+                file.write("\n" + person + encodingLine)
+        file.close()
         encodeByPerson(imgpath, person, txtpath)
 
-def encodeByPerson(imgpath, person, txtpath):
-    encodings = []
-    names = []
-
-    pix = os.listdir(imgpath + '/' + person)
-    for person_img in pix:
-        # Get the face encodings for the face in each image file
-        face = face_recognition.load_image_file(imgpath + '/' + person + "/" + person_img)
-        if checkFace(imgpath + '/' + person + "/" + person_img):
-            face_enc = face_recognition.face_encodings(face)[0]
-            # Add face encoding for current image with corresponding label (name) to the training data
-            encodings.append(face_enc)
-            names.append(person)
-
-
-    # Clear file and write new encodings
-
-
-    file = open(txtpath, "a")
-    file.write('\n')
-    for (name, encoding) in zip(names, encodings):
-        print(encodingToLine(name, encoding))
-        file.write(encodingToLine(name, encoding))
-
-    file.close()
+def encodeByPerson(imgpath):
+    # Get the face encodings for the face in each image file
+    encoding = face_recognition.face_encodings(imgpath)[0]
+    return  ":" + ",".join(str(val) for val in encoding)
 
 def checkFace(imgpath):
-    face = face_recognition.load_image_file(imgpath)
-    face_bounding_boxes = face_recognition.face_locations(face)
+    face_bounding_boxes = face_recognition.face_locations(imgpath)
     # If training image contains exactly one face
     if len(face_bounding_boxes) == 1:
         return True
     else:
-        print(imgpath + " does not contain one face; it contains: " + str(len(face_bounding_boxes)))
+        print("Image does not contain one face; it contains: " + str(len(face_bounding_boxes)))
         return False
 
 def checkValidCamInput(imgpath, acceptableNum):

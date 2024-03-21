@@ -7,9 +7,11 @@ import os
 from datetime import datetime
 # from camera import capture_and_upload_frames
 from inference import infer, loginInfer
-from face_to_encoding import encodeSet, encodeByPerson, checkValidCamInput
+from face_to_encoding import encodeSet, encodeByPerson, checkValidCamInput, checkFace
 from train import train
 from models import db, User
+from PIL import Image
+import numpy as np
 
 app = Flask(__name__)
 
@@ -68,6 +70,7 @@ def home():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    session.pop('username', None)
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
@@ -85,30 +88,34 @@ def login():
 
 @app.route('/faceID', methods=['GET','POST'])
 def faceID():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    session['authenticated'] = False
     if request.method == 'POST':
         if 'username' not in session:
             return redirect(url_for('login'))
         username = session['username']
 
         frames = []
-        testFileName = "" # Temporary solution, should be changed
+        # testFileName = "" # Temporary solution, should be changed
         for i in range(len(request.files)):
             frame = request.files['frame_' + str(i)]
-            filename = secure_filename(frame.filename)
+            # filename = secure_filename(frame.filename)
             
-            # Generate a unique filename with timestamp
-            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-            filename = f"{timestamp}_{filename}"
+            ## Generate a unique filename with timestamp
+            # timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+            # filename = f"{timestamp}_{filename}"
             
-            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            with open(filepath, 'wb') as file:
-                file.write(frame.read())
+            # filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            # with open(filepath, 'wb') as file:
+            #    file.write(frame.read())
             frames.append(frame)
 
-            testFileName = filepath # Temporary solution, should be changed
-       
+            # testFileName = filepath # Temporary solution, should be changed
+    
         # For demonstration assumin authentication is successful
-        result = infer(testFileName)
+        # result = infer(testFileName)
+        result = infer(frames[0].stream)
         if (result != None and result[0] == username):
             print('Face recognized for '+ username)
             session['authenticated'] = True
@@ -132,36 +139,25 @@ def register():
         password = request.form.get('password')
         # Store the registration data in the user_info dictionary
         user_info[email] = generate_password_hash(password)
-
-        frames = []
-        index = 0
-        while f'faceImages_{index}' in request.files:
-            frame = request.files[f'faceImages_{index}']
-            
-            # Generate a unique filename with timestamp and index
-            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-            filename = f"{email}_{timestamp}_{index}.{frame.filename.split('.')[-1]}"
-            
-            os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], email), exist_ok=True)
-            save_path = os.path.join(app.config['UPLOAD_FOLDER'], email, filename)
-            frame.save(save_path)
-            frames.append(frame)
-            index += 1
-
-        if email and password and frames:
-            if checkValidCamInput(app.config['UPLOAD_FOLDER'] + '/' + email, 30):
-                # check if the face registration in register.html is successful
-                success = True
-
-                # Initailize models
-                encodeByPerson(app.config['UPLOAD_FOLDER'], email, app.config['ENCODINGS_PATH'])
+        
+        if email and password and request.files:
+            try:
+                encodings = []
+                for index in range(len(request.files)):
+                    if f'faceImages_{index}' in request.files:
+                        person_img = request.files[f'faceImages_{index}']
+                        img = Image.open(person_img)
+                        img_arr = np.array(img)
+                        if checkFace(img_arr):
+                            encodingLine = encodeByPerson(img_arr)
+                            if encodingLine:
+                                encodings.append(encodingLine)
+                with open(app.config['ENCODINGS_PATH'], "a") as file:
+                    file.write("\n" + email + ''.join(encodings))
                 train(app.config['ENCODINGS_PATH'])
-
-                if success:
-                    message = 'Registration successful!'
-                else:
-                    message = 'Registration failed.'
-            else:
+                message = 'Registration successful!'
+            except Exception as e:
+                print(f"Error during registration: {str(e)}")
                 message = 'Registration failed.'
         else:
             message = 'Registration failed.'

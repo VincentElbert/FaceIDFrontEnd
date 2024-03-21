@@ -3,13 +3,16 @@ import os
 import numpy as np
 import face_recognition
 import face_to_encoding
+from PIL import Image
 
-def infer(imgpath):
-    if not face_to_encoding.checkFace(imgpath):
+def infer(img_buffer):
+    img = Image.open(img_buffer)
+    img_arr = np.array(img)
+    if not face_to_encoding.checkFace(img_arr):
         return None
     else:
-        face = face_recognition.load_image_file(imgpath)
-        face_enc = face_recognition.face_encodings(face)[0]
+        face_enc = face_recognition.face_encodings(img_arr)[0]
+        
         with open('face_classifier.pkl', 'rb') as fid:
             clf = pickle.load(fid)
             p = clf.predict_proba(face_enc.reshape(1, -1))
