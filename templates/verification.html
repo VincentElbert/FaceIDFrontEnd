@@ -1,17 +1,26 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Enter Verification Code</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename = 'style.css') }}"
+    />
 </head>
 <body>
-    <h1>Enter Verification Code</h1>
-    <form id="verification-form">
-        <input type="hidden" name="email" value="{{ email }}">
-        <label for="verification_code">Verification Code:</label>
-        <input type="text" id="verification_code" name="verification_code" maxlength="6" required>
-        <input type="submit" value="Verify">
-    </form>
-    <div id="message"></div>
+    <img id="logo" src="static/face_defense_master_logo.png" alt="logo" />
+    <div class="container">
+        <h1>Enter Verification Code</h1>
+        <form id="verification-form">
+            <input type="hidden" name="email" value="{{ email }}">
+            <label for="verification_code">Verification Code:</label>
+            <input type="text" id="verification_code" name="verification_code" maxlength="6" required>
+            <input type="submit" value="Verify">
+        </form>
+        <div class="error-message" id="message"></div>
+    </div>
     
     <script>
         document.getElementById('verification-form').addEventListener('submit', async function(event) {

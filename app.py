@@ -161,32 +161,22 @@ def register():
             'password': generate_password_hash(password),
             'verification_code': verification_code
         }
+        
+        if email and password and request.files:
+            try:
+                encodings = []
+                for index in range(len(request.files)):
+                    if f'faceImages_{index}' in request.files:
+                        person_img = request.files[f'faceImages_{index}']
+                        encodingLine = encodeByPerson(person_img)
+                        if encodingLine:
+                            encodings.append(encodingLine)
 
-        frames = []
-        index = 0
-        while f'faceImages_{index}' in request.files:
-            frame = request.files[f'faceImages_{index}']
-            
-            # Generate a unique filename with timestamp and index
-            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-            filename = f"{email}_{timestamp}_{index}.{frame.filename.split('.')[-1]}"
-            
-            os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], email), exist_ok=True)
-            save_path = os.path.join(app.config['UPLOAD_FOLDER'], email, filename)
-            frame.save(save_path)
-            frames.append(frame)
-            index += 1
-
-        if email and password and frames:
-            if checkValidCamInput(app.config['UPLOAD_FOLDER'] + '/' + email, 30):
-                # check if the face registration in register.html is successful
-                success = True
-
-                # Initailize models
-                encodeByPerson(app.config['UPLOAD_FOLDER'], email, app.config['ENCODINGS_PATH'])
-                train(app.config['ENCODINGS_PATH'])
-
-                if success:
+                if encodings:
+                    with open(app.config['ENCODINGS_PATH'], "a") as file:
+                        file.write("\n")
+                        file.write("\n".join([email + encoding for encoding in encodings]))
+                    train(app.config['ENCODINGS_PATH'])
                     email_string = "Thank you for registering! Please enter the following code to activate your account: " + str(verification_code)
                     msg = Message('Registration Confirmation', sender='team1test@fastmail.com', recipients=[email])
                     msg.body = email_string
@@ -205,9 +195,13 @@ def register():
                     db.session.add(new_user)
                     db.session.add(new_user_connection)
                     db.session.commit()
-                    return redirect(url_for('verification', email=email))
+
+                    return jsonify({'message': 'Registration successful!'})
                 else:
                     return jsonify({'message': 'Registration failed.'})
+            except Exception as e:
+                print(f"Error during registration: {str(e)}")
+                return jsonify({'message': 'Registration failed.'})
         else:
             return jsonify({'message': 'Registration failed.'})
     return render_template('register.html')
