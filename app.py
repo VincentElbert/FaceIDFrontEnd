@@ -152,18 +152,10 @@ def register():
         if email and password and request.files:
             try:
                 encodings = []
-                max_threads = 6  # Maximum number of threads to deploy
-
-                with ThreadPoolExecutor(max_workers=max_threads) as executor:
-                    futures = []
-                    for index in range(len(request.files)):
-                        if f'faceImages_{index}' in request.files:
-                            person_img = request.files[f'faceImages_{index}']
-                            future = executor.submit(encodeByPerson, person_img)
-                            futures.append(future)
-
-                    for future in futures:
-                        encodingLine = future.result()
+                for index in range(len(request.files)):
+                    if f'faceImages_{index}' in request.files:
+                        person_img = request.files[f'faceImages_{index}']
+                        encodingLine = encodeByPerson(person_img)
                         if encodingLine:
                             encodings.append(encodingLine)
 
@@ -190,7 +182,8 @@ def register():
                     db.session.add(new_user)
                     db.session.add(new_user_connection)
                     db.session.commit()
-                    return redirect(url_for('verification', email=email))
+
+                    return jsonify({'message': 'Registration successful!'})
                 else:
                     return jsonify({'message': 'Registration failed.'})
             except Exception as e:
