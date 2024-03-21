@@ -29,6 +29,7 @@ class Connection(Base):
     cid: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4())
     user_email: Mapped[str] = mapped_column(ForeignKey("user_table.email"))
     user: Mapped["User"] = relationship(back_populates="connections")
+    device: Mapped[str]
 
 
 class LogEvent(Base):
