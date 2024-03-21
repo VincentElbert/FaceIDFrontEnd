@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verification</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <img id="logo" src="static/face_defense_master_logo.png" alt="logo"/>
+    <div class="container">    
+        <h2>Enter Verification Code</h2>
+        <form id="verification-form">
+            <input type="hidden" name="email" value="{{ email }}">
+            <label for="verification_code">Verification Code:</label>
+            <input type="text" id="verification_code" name="verification_code" placeholder="Verification Code" maxlength="6" required>
+            <input type="submit" value="Verify">
+        </form>
+        <div id="message"></div>
+    </div>
+    
+    <script>
+        document.getElementById('verification-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            console.log("{{ email }}");
+            
+            const email = document.getElementsByName('email')[0].value;
+            const verificationCode = document.getElementById('verification_code').value;
+
+            console.log("--------------------------------------------------------------Email:", email);
+            
+            const response = await fetch("/verification", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email: email, verification_code: verificationCode }),
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                alert("Activation successful!");
+                window.location.href = "/login";
+            } else {
+                document.getElementById('message').textContent = data.message;
+            }
+        });
+    </script>
+</body>
+</html>
