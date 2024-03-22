@@ -1,15 +1,109 @@
-<!-- templates/home.html -->
-
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <title>Home</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
+<style>
+    .navbar {
+        top: 0px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: #333;
+      padding: 10px;
+      color: #fff;
+    }
+    
+    .navbar .logo {
+      display: flex;
+      align-items: center;
+    }
+    
+    .navbar .logo img {
+      height: 30px;
+      margin-right: 10px;
+    }
+    
+    .navbar .icons {
+      display: flex;
+      align-items: center;
+    }
+    
+    .navbar .icons img {
+      height: 20px;
+      margin-left: 10px;
+    }
+    
+    .sidebar {
+      background-color: #f1f1f1;
+      padding: 10px;
+      grid-area: sidebar;
+      width: calc(100% - 200px); /* Subtracting the width of the sidebar */
+    }
+    
+    .sidebar .menu-item {
+      margin-bottom: 10px;
+    }
+    
+    .content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-gap: 10px;
+      grid-area: content;
+      padding: 10px;
+    }
+    
+    .card {
+      background-color: #fff;
+      padding: 10px;
+      border-radius: 5px;
+    }
+    
+    .settings {
+      grid-area: settings;
+    }
+    
+    .logout {
+      grid-area: logout;
+    }
+    
+    /* CSS code for responsive layout */
+    @media (max-width: 768px) {
+      .sidebar {
+        display: none;
+      }
+      
+      .content {
+        grid-template-columns: 1fr;
+      }
+    }
+</style>
 <body>
-    <h1>Welcome, {{ username }}!</h1>
-    <a href="{{ url_for('logout') }}">Logout</a>
+  <div class="navbar">
+    <div class="logo">
+      <img src="hamburger-icon.png" alt="Hamburger Icon">
+      <img src="web-logo.png" alt="Web Logo">
+    </div>
+    <div class="icons">
+      <img src="logout-logo.png" alt="Logout Logo">
+      <img src="profile-logo.png" alt="Profile Logo">
+    </div>
+  </div>
+  
+  <div class="sidebar">
+    <div class="menu-item">Account</div>
+    <div class="menu-item">Log-in History</div>
+    <div class="menu-item">Connected Devices</div>
+    <div class="menu-item">Connected Apps</div>
+    <div class="settings">Settings</div>
+    <div class="logout">Logout</div>
+  </div>
+  
+  <div class="content">
+    <div class="card">Log-in History</div>
+    <div class="card">Connected Devices</div>
+    <div class="card">Connected Apps</div>
+  </div>
 </body>
 </html>

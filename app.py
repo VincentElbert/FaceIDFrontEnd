@@ -2,18 +2,14 @@
 
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
-from werkzeug.utils import secure_filename
 import os
 import ipinfo
 from user_agents import parse
-from datetime import datetime
-# from camera import capture_and_upload_frames
 from inference import infer, loginInfer
 from face_to_encoding import encodeSet, encodeByPerson, checkValidCamInput
 from train import train
-from models import db, User, Connection, LogEvent
+from models import db, User, Connection
 from concurrent.futures import ThreadPoolExecutor
-from multiprocessing import Pool
 import random
 from flask_mail import Mail, Message
 
@@ -164,13 +160,16 @@ def register():
                         file.write("\n")
                         file.write("\n".join([email + encoding for encoding in encodings]))
                     train(app.config['ENCODINGS_PATH'])
-                    email_string = "Thank you for registering! Please enter the following code to activate your account: " + str(verification_code)
-                    msg = Message('Registration Confirmation', sender='team1test@fastmail.com', recipients=[email])
-                    msg.body = email_string
-                    mail.send(msg)
-                    print("User info after registration:")
-                    print(user_info)
-                    print(email)
+                    try:
+                        email_string = "Thank you for registering! Please enter the following code to activate your account: " + str(verification_code)
+                        msg = Message('Registration Confirmation', sender='team1test@fastmail.com', recipients=[email])
+                        msg.body = email_string
+                        mail.send(msg)
+                        print("User info after registration:")
+                        print(user_info)
+                        print(email)
+                    except Exception as e:
+                        print(f"Error during registration: {str(e)}")
                     new_user = User(
                         email=email,
                         password=generate_password_hash(password),
