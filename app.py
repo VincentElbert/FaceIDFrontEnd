@@ -13,6 +13,7 @@ from face_to_encoding import encodeSet, encodeByPerson, checkValidCamInput
 from train import train
 from models import db, User, Connection, LogEvent
 import random
+from sqlalchemy import text
 from flask_mail import Mail, Message
 
 app = Flask(__name__)
@@ -140,6 +141,38 @@ def faceID():
     else:
         return render_template('faceID.html', username=session['username'])
 
+@app.route('/recoveryFaceID', methods=['GET','POST'])
+def recoveryFaceID():
+    verification_code = generate_verification_code()
+    if request.method == 'POST': 
+        frames = []
+        for i in range(len(request.files)):
+            frame = request.files['frame_' + str(i)]
+
+            frames.append(frame)
+        result = infer(frames[0].stream)
+        if (result != None and result[0]):
+            email = str(result[0])
+            print('Face recognized for '+ str(result[0]))
+            user_info[result[0]]['verification_code'] = verification_code
+            print(verification_code)
+            email_string = "Please enter the following code for verification to proceed to password reset: " + str(verification_code)
+            msg = Message('Reset Password', sender='team1test@fastmail.com', recipients=[result[0]])
+            msg.body = email_string
+            mail.send(msg)
+            response = {
+                'redirect': url_for('verification'),
+                'email': email,
+                'recovery': True
+            }
+            return jsonify(response)
+            # return redirect(url_for('verification', email=result[0], recovery=True))  # Return JSON response with redirect URL
+        else:
+            print('Face not recognized')
+            return jsonify({'message': 'Face not recognized. Please Try Again'})  # Return JSON response with message
+    else:
+        return render_template('recoveryFaceID.html')
+
 @app.route('/logout')
 def logout():
     session['authenticated'] = False
@@ -183,10 +216,6 @@ def register():
                     msg = Message('Registration Confirmation', sender='team1test@fastmail.com', recipients=[email])
                     msg.body = email_string
                     mail.send(msg)
-                    print("User info after registration:")
-                    print(user_info)
-                    print(email)
-
 
                     return jsonify({'message': 'Registration successful!'})
                 else:
@@ -197,6 +226,24 @@ def register():
         else:
             return jsonify({'message': 'Registration failed.'})
     return render_template('register.html')
+
+@app.route('/reset', methods=['GET', 'POST'])
+def reset():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        new_password = request.form.get('password')
+
+        user = db.session.query(User).filter(User.email == email).first()
+        if user:
+            user.password = generate_password_hash(new_password)
+            db.session.commit()
+            return jsonify({'message': 'Reset password successful!'})
+
+        else:
+            print("User not found.")
+    else:
+        email = request.args.get('email')
+        return render_template('reset.html', email= email)
 
 @app.route('/setup')
 def setup():
@@ -221,19 +268,10 @@ def verification():
         email = email_waitfor_verify
         #email = data.get('email')
         verification_code = data.get('verification_code')
-
-        print(data)
-        print("User info after registration:")
-        print(user_info)
-        print("The email-------------------------------------")
-        print(email)
-        print("The email-------------------------------------")
-        print("The verification_code-------------------------------------")
-        print(verification_code)
-        print("The verification_code-------------------------------------")
+        recovery = data.get('recovery')
 
         if email in user_info:
-            if user_info[email]['verification_code'] == verification_code:
+            if user_info[email]['verification_code'] == verification_code and recovery != 'true':
                 # Verification code is correct
                 # Mark the email as verified in the user_info dictionary or your database
                 user_info[email]['verified'] = True
@@ -249,16 +287,20 @@ def verification():
                 db.session.add(new_user_connection)
                 db.session.commit()
                 
-                return {'success': True}
+                return {'success': 'true', 'recovery': 'false'}
+            elif user_info[email]['verification_code'] == verification_code and recovery == 'true':
+                return {'success': 'true', 'recovery': 'true'}
             else:
-                # Verification code is incorrect
-                return {'success': False, 'message': 'Invalid verification code. Please try again.'}
+                return {'success': 'false', 'message': 'Invalid verification code. Please try again.'}
         else:
             # Invalid email
-            return {'success': False, 'message': 'Email is missing'}
+            return {'success': 'false', 'message': 'Email is missing'}
     else:
         email = request.args.get('email')
-        return render_template('verification.html', email=email)
+        recovery = request.args.get('recovery')
+        return render_template('verification.html', email=email, recovery=recovery)
+    
+
 
 # ... other route definitions ...
 
