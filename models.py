@@ -22,7 +22,6 @@ class User(Base):
     connections: Mapped[List["Connection"]] = relationship(back_populates="user")
     logevent: Mapped[List["LogEvent"]] = relationship(back_populates="user")
 
-
 class Connection(Base):
     __tablename__ = "connection_table"
 
