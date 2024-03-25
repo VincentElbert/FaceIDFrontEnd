@@ -150,6 +150,14 @@
       const faceFrame = document.getElementById("face-frame");
       const arrow = document.getElementById("arrow");
 
+      webcam.addEventListener("load", function () {
+        // Enable the scanBtn when the webcam is attached and ready
+        scanBtn.disabled = false;
+      });
+      webcam.addEventListener("loadeddata", function () {
+        // Hide the loading indicator or perform any other necessary actions
+      });
+
       registrationForm.addEventListener("submit", function (e) {
         e.preventDefault();
 

@@ -13,7 +13,7 @@
         <img src="static/face_defense_master_logo.png" alt="Web Logo" class="logo" />
       </div>
       <div class="nav-items">
-        <img href="{{ url_for('logout') }}" src="static/logout-icon.png" alt="Logout Icon" class="icon" />
+        <img id="logout-nav" src="static/logout-icon.png" alt="Logout Icon" class="icon" />
         <img src="static/profile-icon.png" alt="Profile Icon" class="icon" />
         <p>{{username}}</p>
       </div>
@@ -28,14 +28,15 @@
       </div>
       <div class="side-items">
         <div class="menu-item">Settings</div>
-        <div class="menu-item">Logout</div>
+        <div id="logout-menu" class="menu-item">Logout</div>
       </div>
     </div>
 
     <div class="content">
       <div class="cards">
 
-        <div class="card">
+        <div id="connected-devices" class="card">
+          <img id="connected-devices-expand" src="static/expand.png" alt="Expand Icon" class="expand-minimize icon" />
           <h2>Connected Devices</h2>
           <p>
             &emsp;Active Devices: ...
@@ -55,7 +56,8 @@
 
         </div>
 
-        <div class="card">
+        <div id="connected-apps" class="card">
+          <img id="connected-apps-expand" src="static/expand.png" alt="Expand Icon" class="expand-minimize icon" />
           <h2>Connected Apps</h2>
           <div class="apps-container">
             <div class="apps">Jira</div>
@@ -64,11 +66,31 @@
             <div class="apps">+add apps</div>
           </div>
         </div>
-        <div class="card full-row">
+        <div id="login-history" class="card full-row">
+          <img id="login-history-expand" src="static/expand.png" alt="Expand Icon" class="expand-minimize icon" />
           <h2>Log-in History</h2>
           Device      Date & Time     Location      Event
         </div>
       </div>
     </div>
+    <script>
+      var logoutMenu = document.getElementById('logout-menu');
+      var logoutNav = document.getElementById('logout-nav');
+      
+      var connectedDevicesExpand = document.getElementById('connected-devices-expand');
+      var connectedAppsExpand = document.getElementById('connected-apps-expand');
+      var loginHistoryExpand = document.getElementById('login-history-expand');
+    
+      logoutMenu.addEventListener('click', function() {
+        window.location.href = "{{ url_for('logout') }}";
+      });
+      logoutNav.addEventListener('click', function() {
+        window.location.href = "{{ url_for('logout') }}";
+      });
+
+      connectedDevicesExpand.addEventListener('click', function(){
+        
+      });
+    </script>
   </body>
 </html>

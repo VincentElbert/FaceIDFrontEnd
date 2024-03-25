@@ -33,8 +33,6 @@ user_info = {
 }
 
 mail = Mail(app)
-ipinfo_token = "3fcc779048091b"
-ip_handler = ipinfo.getHandler(ipinfo_token)
 
 UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'resources', 'image')
 ENCODINGS_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'resources', 'encodings.txt')
@@ -80,13 +78,7 @@ def index():
 def home():
     if 'username' not in session or not session.get('authenticated', False):
         return redirect(url_for('login'))
-    username=session['username']
-    return render_template('home.html', 
-                            username=username
-                            # insert the devices here
-                            # insert the apps
-                            # insert the log-in history
-                            )
+    return render_template('home.html', username=session['username'])
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -94,7 +86,6 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        print(ip_handler.getDetails(request.remote_addr).country_name)
 
         if db.session.query(User.email).filter_by(email=username).scalar() is not None:
             hashed_pw = db.session.execute(db.select(User).filter_by(email=username)).scalar_one().password
