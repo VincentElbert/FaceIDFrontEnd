@@ -25,7 +25,7 @@ class User(Base):
 class Connection(Base):
     __tablename__ = "connection_table"
 
-    cid: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4())
+    cid: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     user_email: Mapped[str] = mapped_column(ForeignKey("user_table.email"))
     user: Mapped["User"] = relationship(back_populates="connections")
     device: Mapped[str]
@@ -34,7 +34,7 @@ class Connection(Base):
 class LogEvent(Base):
     __tablename__ = "logevent_table"
 
-    eid: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4())
+    eid: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     user_email: Mapped[str] = mapped_column(ForeignKey("user_table.email"))
     user: Mapped["User"] = relationship(back_populates="logevent")
     time: Mapped[datetime.datetime]

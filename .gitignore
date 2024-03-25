@@ -2,3 +2,5 @@ __pycache__/
 resources/image/
 face_classifier.pkl
 *.db
+instance/
+.DS_Store
