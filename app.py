@@ -133,7 +133,9 @@ def logout():
 def register():
     if request.method == 'POST':
         email = request.form.get('email')
+        global password
         password = request.form.get('password')
+        global user_agent
         user_agent = parse(request.user_agent.string)
         verification_code = generate_verification_code()
         global email_waitfor_verify 
@@ -160,27 +162,14 @@ def register():
                         file.write("\n")
                         file.write("\n".join([email + encoding for encoding in encodings]))
                     train(app.config['ENCODINGS_PATH'])
-                    try:
-                        email_string = "Thank you for registering! Please enter the following code to activate your account: " + str(verification_code)
-                        msg = Message('Registration Confirmation', sender='team1test@fastmail.com', recipients=[email])
-                        msg.body = email_string
-                        mail.send(msg)
-                        print("User info after registration:")
-                        print(user_info)
-                        print(email)
-                    except Exception as e:
-                        print(f"Error during registration: {str(e)}")
-                    new_user = User(
-                        email=email,
-                        password=generate_password_hash(password),
-                    )
-                    new_user_connection = Connection(
-                        device=str(user_agent).split(' / ')[0],
-                    )
-                    new_user.connections.append(new_user_connection)
-                    db.session.add(new_user)
-                    db.session.add(new_user_connection)
-                    db.session.commit()
+                    email_string = "Thank you for registering! Please enter the following code to activate your account: " + str(verification_code)
+                    msg = Message('Registration Confirmation', sender='team1test@fastmail.com', recipients=[email])
+                    msg.body = email_string
+                    mail.send(msg)
+                    print("User info after registration:")
+                    print(user_info)
+                    print(email)
+
 
                     return jsonify({'message': 'Registration successful!'})
                 else:
@@ -220,6 +209,17 @@ def verification():
                 # Verification code is correct
                 # Mark the email as verified in the user_info dictionary or your database
                 user_info[email]['verified'] = True
+                new_user = User(
+                    email=email,
+                    password=generate_password_hash(password),
+                )
+                new_user_connection = Connection(
+                    device=str(user_agent).split(' / ')[0],
+                )
+                new_user.connections.append(new_user_connection)
+                db.session.add(new_user)
+                db.session.add(new_user_connection)
+                db.session.commit()
                 
                 return {'success': True}
             else:
