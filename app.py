@@ -81,9 +81,11 @@ def home():
     if 'username' not in session or not session.get('authenticated', False):
         return redirect(url_for('login'))
     username=session['username']
+    user = db.session.execute(db.select(User).filter_by(email=username)).scalar_one()
     return render_template('home.html', 
-                            username=username
+                            username=username,
                             # insert the devices here
+                            device=user.connections
                             # insert the apps
                             # insert the log-in history
                             )
