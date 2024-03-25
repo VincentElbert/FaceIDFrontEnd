@@ -13,8 +13,9 @@
         <img src="static/face_defense_master_logo.png" alt="Web Logo" class="logo" />
       </div>
       <div class="nav-items">
-        <img src="static/logout-icon.png" alt="Logout Icon" class="icon" />
+        <img href="{{ url_for('logout') }}" src="static/logout-icon.png" alt="Logout Icon" class="icon" />
         <img src="static/profile-icon.png" alt="Profile Icon" class="icon" />
+        <p>{{username}}</p>
       </div>
     </div>
 
@@ -36,9 +37,12 @@
 
         <div class="card">
           <h2>Connected Devices</h2>
-
-          Active Devices: ...
-          Total Connected Devices: ...
+          <p>
+            &emsp;Active Devices: ...
+          </p>
+          <p>
+            &emsp;Total Connected Devices: ...
+          </p>
 
           <div class="devices-container">
             <div class="device">

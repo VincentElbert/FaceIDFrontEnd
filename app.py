@@ -78,7 +78,13 @@ def index():
 def home():
     if 'username' not in session or not session.get('authenticated', False):
         return redirect(url_for('login'))
-    return render_template('home.html', username=session['username'])
+    username=session['username']
+    return render_template('home.html', 
+                            username=username
+                            # insert the devices here
+                            # insert the apps
+                            # insert the log-in history
+                            )
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
