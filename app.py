@@ -406,25 +406,48 @@ def send_email(email_waitfor_verify, verification_code):
                         font-family: Arial, sans-serif;
                         background-color: #f4f4f4;
                         padding: 20px;
+                        margin: 0;
+                    }}
+                    .container {{
+                        max-width: 600px;
+                        margin: 0 auto;
+                        background-color: #ffffff;
+                        padding: 0;
+                        border-radius: 5px;
+                        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+                        border: 1px solid #000000;
                     }}
                     h1 {{
-                        color: #333333;
+                        color: #ffffff;
+                        background-color: #ff6600;
+                        padding: 20px;
+                        margin: 0;
                         text-align: center;
+                        border-top-left-radius: 1px;
+                        border-top-right-radius: 1px;
                     }}
                     p {{
                         color: #666666;
                         line-height: 1.5;
+                        padding: 20px;
+                        margin: 0;
                     }}
                     .code {{
                         font-size: 24px;
                         font-weight: bold;
                         color: #ff6600;
                         text-align: center;
-                        margin: 10px 0;
+                        margin: 20px 0;
+                        padding: 10px;
+                        background-color: #f9f9f9;
+                        border: 2px solid #e0e0e0;
+                        border-radius: 5px;
                     }}
                     .expiration {{
                         color: #999999;
                         text-align: center;
+                        margin: 0;
+                        padding-bottom: 20px;
                     }}
                     .simpletext {{
                         text-align: center;
@@ -432,11 +455,13 @@ def send_email(email_waitfor_verify, verification_code):
                 </style>
             </head>
             <body>
-                <h1>Account Recovery </h1>
-                <p class="simpletext" >Please enter the following code to proceed to your account recovery:</p>
-                <div class="code">{verification_code}</div>
-                <p class="expiration">The code will expire in 5 minutes.</p>
-                <p class="simpletext">If you have any questions or need assistance, feel free to contact our support team via itsupport@FaceDefenseMaster.com</p>
+                <div class="container">
+                    <h1>Account Recovery</h1>
+                    <p class="simpletext">Please enter the following code to proceed to your account recovery:</p>
+                    <div class="code">{verification_code}</div>
+                    <p class="expiration">The code will expire in 5 minutes.</p>
+                    <p class="simpletext">If you have any questions or need assistance, feel free to contact our support team via itsupport@FaceDefenseMaster.com</p>
+                </div>
             </body>
             </html>
             """
@@ -453,25 +478,48 @@ def send_email(email_waitfor_verify, verification_code):
                     font-family: Arial, sans-serif;
                     background-color: #f4f4f4;
                     padding: 20px;
+                    margin: 0;
+                }}
+                .container {{
+                    max-width: 600px;
+                    margin: 0 auto;
+                    background-color: #ffffff;
+                    padding: 0;
+                    border-radius: 5px;
+                    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+                    border: 1px solid #000000;
                 }}
                 h1 {{
-                    color: #333333;
+                    color: #ffffff;
+                    background-color: #ff6600;
+                    padding: 20px;
+                    margin: 0;
                     text-align: center;
+                    border-top-left-radius: 1px;
+                    border-top-right-radius: 1px;
                 }}
                 p {{
                     color: #666666;
                     line-height: 1.5;
+                    padding: 20px;
+                    margin: 0;
                 }}
                 .code {{
                     font-size: 24px;
                     font-weight: bold;
                     color: #ff6600;
                     text-align: center;
-                    margin: 10px 0;
+                    margin: 20px 0;
+                    padding: 10px;
+                    background-color: #f9f9f9;
+                    border: 2px solid #e0e0e0;
+                    border-radius: 5px;
                 }}
                 .expiration {{
                     color: #999999;
                     text-align: center;
+                    margin: 0;
+                    padding-bottom: 20px;
                 }}
                 .simpletext {{
                     text-align: center;
@@ -479,11 +527,13 @@ def send_email(email_waitfor_verify, verification_code):
             </style>
         </head>
         <body>
-            <h1>Welcome to Face Defense Master!</h1>
-            <p class="simpletext" >Thank you for registering with us. Please enter the following code to activate your account:</p>
-            <div class="code">{verification_code}</div>
-            <p class="expiration">The code will expire in 5 minutes.</p>
-            <p class="simpletext">If you have any questions or need assistance, feel free to contact our support team via itsupport@FaceDefenseMaster.com</p>
+            <div class="container">
+                <h1>Welcome to Face Denfense Master!</h1>
+                <p class="simpletext">Please enter the following code to proceed to activate your account:</p>
+                <div class="code">{verification_code}</div>
+                <p class="expiration">The code will expire in 5 minutes.</p>
+                <p class="simpletext">If you have any questions or need assistance, feel free to contact our support team via itsupport@FaceDefenseMaster.com</p>
+            </div>
         </body>
         </html>
         """
