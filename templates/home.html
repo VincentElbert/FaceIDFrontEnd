@@ -7,18 +7,6 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='page.css') }}"/>
   </head>
   <body>
-    <div class="navbar">
-      <div class="nav-items">
-        <img src="static/menu-icon.png" alt="Hamburger Icon" class="icon" />
-        <img src="static/face_defense_master_logo.png" alt="Web Logo" class="logo" />
-      </div>
-      <div class="nav-items">
-        <img href="{{ url_for('logout') }}" src="static/logout-icon.png" alt="Logout Icon" class="icon" />
-        <img src="static/profile-icon.png" alt="Profile Icon" class="icon" />
-        <p>{{username}}</p>
-      </div>
-    </div>
-
     <div class="sidebar">
       <div class="side-items">
         <div class="menu-item">Account</div>
@@ -31,6 +19,17 @@
         <div class="menu-item">Logout</div>
       </div>
     </div>
+    <div class="navbar">
+      <div class="nav-items">
+        <img src="static/menu-icon.png" alt="Hamburger Icon" class="icon" />
+        <img src="static/face_defense_master_logo.png" alt="Web Logo" class="logo" />
+      </div>
+      <div class="nav-items">
+        <img id="logout-nav" src="static/logout-icon.png" alt="Logout Icon" class="icon" />
+        <img src="static/profile-icon.png" alt="Profile Icon" class="icon" />
+        <p>{{username}}</p>
+      </div>
+    </div>
 
     <div class="content">
       <div class="cards">
@@ -38,37 +37,131 @@
         <div class="card">
           <h2>Connected Devices</h2>
           <p>
-            &emsp;Active Devices: ...
+            Active Devices: (Cannot fetch active devices)
           </p>
-          <p>
-            &emsp;Total Connected Devices: ...
+          <p id="total-devices">
+            Total Connected Devices: (Cannot fetch total devices)
           </p>
 
-          <div class="devices-container">
-            <div class="device">
-              device a
-            </div>
-            <div class="device">
-              device b
-            </div>
+          <div id="devices-container" class="container">
           </div>
 
+          <img src="static/expand.png" alt="Expand" class="expand-minimize icon">
         </div>
 
         <div class="card">
           <h2>Connected Apps</h2>
-          <div class="apps-container">
-            <div class="apps">Jira</div>
-            <div class="apps">Teams</div>
+          <div id="apps-container" class="container">
+            <div class="app">
+              <img src="static/Jira.png" alt="Jira">
+              Jira
+            </div>
+            <div class="app">
+              <img src="static/Teams.png" alt="Teams">
+              Teams
+            </div>
 
-            <div class="apps">+add apps</div>
+            <div class="app">
+              <img src="static/add-icon.png" alt="Add Icon">
+              + Add apps
+            </div>
           </div>
+          
+          <img src="static/expand.png" alt="Expand" class="expand-minimize icon">
         </div>
         <div class="card full-row">
           <h2>Log-in History</h2>
-          Device      Date & Time     Location      Event
+          <div class="table-container" class="container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Device</th>
+                  <th>Date & Time</th>
+                  <th>Location</th>
+                  <th>Event</th>
+                </tr>
+              </thead>
+              <tbody id="history-table-body">
+                <!-- History table body will be dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+
+          <img src="static/expand.png" alt="Expand" class="expand-minimize icon">
         </div>
       </div>
     </div>
+    <script>
+      const connectionsData = JSON.parse('{{ connections|safe }}');
+      const historiesData = JSON.parse('{{ histories|safe }}');
+      const totalDevicesElement = document.getElementById('total-devices');
+      const devicesContainer = document.getElementById('devices-container');
+      const historyTableBody = document.getElementById('history-table-body');
+      
+      totalDevicesElement.textContent = `Total Connected Devices: ${connectionsData.length.toString()}`;
+
+      connectionsData.forEach(connection => {
+        const deviceName = connection.device;
+        const deviceElement = document.createElement('div');
+        deviceElement.className = 'device';
+
+        const imageElement = document.createElement('img');
+        if(deviceName == 'PC'){
+          imageElement.src = 'static/pc-icon.png';
+          imageElement.alt = 'PC Icon';
+        }
+        deviceElement.appendChild(imageElement);
+        
+        const nameElement = document.createElement('h3');
+        nameElement.textContent = deviceName;
+        deviceElement.appendChild(nameElement);
+        
+        devicesContainer.appendChild(deviceElement);
+      });
+
+      historiesData.forEach(history => {
+        const device = history.device;
+        const dateTime = history.time;
+        const location = history.location;
+        const event = history.event_desc;
+
+        const row = document.createElement('tr');
+        const deviceCell = document.createElement('td');
+        deviceCell.textContent = device;
+        row.appendChild(deviceCell);
+
+        const dateTimeCell = document.createElement('td');
+        dateTimeCell.textContent = dateTime;
+        row.appendChild(dateTimeCell);
+
+        const locationCell = document.createElement('td');
+        locationCell.textContent = location;
+        row.appendChild(locationCell);
+
+        const eventCell = document.createElement('td');
+        eventCell.textContent = event;
+        row.appendChild(eventCell);
+
+        historyTableBody.appendChild(row);
+      });
+
+      var logoutMenu = document.getElementById('logout-menu');
+      var logoutNav = document.getElementById('logout-nav');
+      
+      var connectedDevicesExpand = document.getElementById('connected-devices-expand');
+      var connectedAppsExpand = document.getElementById('connected-apps-expand');
+      var loginHistoryExpand = document.getElementById('login-history-expand');
+    
+      logoutMenu.addEventListener('click', function() {
+        window.location.href = "{{ url_for('logout') }}";
+      });
+      logoutNav.addEventListener('click', function() {
+        window.location.href = "{{ url_for('logout') }}";
+      });
+
+      connectedDevicesExpand.addEventListener('click', function(){
+
+      });
+    </script>
   </body>
 </html>
