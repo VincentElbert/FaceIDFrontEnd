@@ -1,5 +1,5 @@
 # app.py
-import datetime
+from datetime import datetime, timedelta
 
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -264,6 +264,8 @@ def register():
                         file.write("\n")
                         file.write("\n".join([email + encoding for encoding in encodings]))
                     train(app.config['ENCODINGS_PATH'])
+                    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    user_info[email]['timestamp'] = timestamp  # Add the timestamp to the existing user_info[email] dictionary
                     send_email(email_waitfor_verify,verification_code)
                     print("User info after registration:")
                     print(user_info)
@@ -326,39 +328,57 @@ def verification():
 
         if email in user_info:
             if user_info[email]['verification_code'] == verification_code and recovery != 'true':
-                # Verification code is correct
-                # Mark the email as verified in the user_info dictionary or your database
-                user_info[email]['verified'] = True
-                new_user = User(
-                    email=email,
-                    password=generate_password_hash(password),
-                )
-                new_user_connection = Connection(
-                    device=": ".join(str(user_agent).split(' / ')[:1]),
-                )
-                new_creation = LogEvent(
-                    time=datetime.now(),
-                    event_desc="Create Account",
-                    ip=request.remote_addr,
-                    location=ip_handler.getDetails(request.remote_addr).country_name
-                    if hasattr(ip_handler.getDetails(request.remote_addr), "country_name")
-                    else "Location Undetectable",
-                )
 
-                try:
-                    if user_info[email]['Recoverying']:
-                        del user_info[email]['Recoverying']
-                except KeyError:
-                    pass
-                    
-                new_user.connections.append(new_user_connection)
-                new_user.logevent.append(new_creation)
-                db.session.add(new_user)
-                db.session.add(new_user_connection)
-                db.session.add(new_creation)
-                db.session.commit()
+                                # Get the current timestamp
+                current_timestamp = datetime.now()
                 
-                return {'success': 'true', 'recovery': 'false'}
+                # Get the registration timestamp from user_info
+                registration_timestamp_str = user_info[email]['timestamp']
+                registration_timestamp = datetime.strptime(registration_timestamp_str, "%Y-%m-%d %H:%M:%S")
+                
+                # Calculate the timestamp 5 minutes ago
+                five_minutes_ago = current_timestamp - timedelta(seconds=60)
+
+                if registration_timestamp > five_minutes_ago:
+                        
+                        # Verification code is correct
+                        # Mark the email as verified in the user_info dictionary or your database
+                        user_info[email]['verified'] = True
+                        new_user = User(
+                            email=email,
+                            password=generate_password_hash(password),
+                        )
+                        new_user_connection = Connection(
+                            device=": ".join(str(user_agent).split(' / ')[:1]),
+                        )
+                        new_creation = LogEvent(
+                            time=datetime.now(),
+                            event_desc="Create Account",
+                            ip=request.remote_addr,
+                            location=ip_handler.getDetails(request.remote_addr).country_name
+                            if hasattr(ip_handler.getDetails(request.remote_addr), "country_name")
+                            else "Location Undetectable",
+                        )
+
+                        try:
+                            if user_info[email]['Recoverying']:
+                                del user_info[email]['Recoverying']
+                        except KeyError:
+                            pass
+                            
+                        new_user.connections.append(new_user_connection)
+                        new_user.logevent.append(new_creation)
+                        db.session.add(new_user)
+                        db.session.add(new_user_connection)
+                        db.session.add(new_creation)
+                        db.session.commit()
+
+                        return {'success': 'true', 'recovery': 'false'}
+                    
+                else:
+
+                    return {'success': False, 'message': 'Verification code has expired. Please request a new one.'}
+
             elif user_info[email]['verification_code'] == verification_code and recovery == 'true':
                 return {'success': 'true', 'recovery': 'true'}
             else:
@@ -413,7 +433,7 @@ def send_email(email_waitfor_verify, verification_code):
                 <p class="simpletext" >Please enter the following code to proceed to your account recovery:</p>
                 <div class="code">{verification_code}</div>
                 <p class="expiration">The code will expire in 5 minutes.</p>
-                <p class="simpletext">If you have any questions or need assistance, feel free to contact our support team.</p>
+                <p class="simpletext">If you have any questions or need assistance, feel free to contact our support team via itsupport@FaceDefenseMaster.com</p>
             </body>
             </html>
             """
@@ -460,7 +480,7 @@ def send_email(email_waitfor_verify, verification_code):
             <p class="simpletext" >Thank you for registering with us. Please enter the following code to activate your account:</p>
             <div class="code">{verification_code}</div>
             <p class="expiration">The code will expire in 5 minutes.</p>
-            <p class="simpletext">If you have any questions or need assistance, feel free to contact our support team.</p>
+            <p class="simpletext">If you have any questions or need assistance, feel free to contact our support team via itsupport@FaceDefenseMaster.com</p>
         </body>
         </html>
         """

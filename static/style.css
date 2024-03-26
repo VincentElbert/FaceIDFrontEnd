@@ -375,6 +375,12 @@ input[type="password"] {
   margin-bottom: 10px;
 }
 
+.modal-content img {
+  display: block;
+  margin: 0 auto;
+  max-width: 70%;
+}
+
 #countdown {
   font-size: 36px;
   font-weight: bold;
@@ -403,4 +409,24 @@ input[type="password"] {
   cursor: pointer;
   font-size: 18px;
   border-radius: 5px;
+}
+
+.processing-popup-window {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.processing-popup-window-content {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 5px;
+  text-align: center;
 }

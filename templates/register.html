@@ -144,6 +144,13 @@
           <button id="retry-btn">Retry</button>
       </div>
     </div>
+    <div id="processing-popup" class="modal" style="display: none;">
+      <div class="modal-content" style="width: 300px;">
+        <!-- <h2>Processing...</h2> -->
+        <img src="static\processing.gif" alt="Loading GIF">
+        <!-- <p>Please wait while we process your face. This may take about 15 seconds.</p> -->
+      </div>
+    </div>
 
     <script>
       const registrationForm = document.getElementById("registration-form");
@@ -203,11 +210,24 @@
         startFaceScan();
       });
 
-      function showSuccessModal() {
-            const firstFiveLetters = emailInput.value.substring(0, 5);
+      function showProcessing() {
+        const processingPopup = document.getElementById("processing-popup");
 
-            const maskedEmail = firstFiveLetters + '*'.repeat(emailInput.value.length - 5);
-            document.getElementById('user-email').textContent = emailInput.value;
+        setTimeout(() => {
+          processingPopup.style.display = "block";
+          Webcam.freeze()
+          arrow.style.display = "None";
+        }, 500);
+
+        return processingPopup;
+      }
+
+      function showSuccessModal() {
+            const firstFiveLetters = emailInput.value.substring(0, 3);
+            const lastEightLetters = emailInput.value.substring(8, 0);
+
+            const maskedEmail = firstFiveLetters + '*'.repeat(emailInput.value.length - 3 - 8) + lastEightLetters;
+            document.getElementById('user-email').textContent = maskedEmail;
             const modal = document.getElementById('register-success-modal');
             modal.style.display = 'block';
 
@@ -223,7 +243,7 @@
 
           const loginBtn = document.getElementById('retry-btn');
           loginBtn.addEventListener('click', function() {
-              window.location.href = "/login";
+              window.location.href = "/register";
           });
       }
 
@@ -296,6 +316,8 @@
           index++;
         }
 
+        const processingPopup = showProcessing();
+
         const formData = new FormData();
         formData.append("email", emailInput.value);
         formData.append("password", passwordInput.value);
@@ -315,10 +337,14 @@
         const data = await response.json();
 
         if (data.message === 'Registration successful!') {
+          processingPopup.style.display = "none";
           showSuccessModal();
         } else {
-          alert('Registration Fail!!!');
-        }
+          setTimeout(() => {
+            processingPopup.style.display = "none";
+            showFailModal();
+          }, 4000);
+        } 
       }
 
       function isValidEmail(email) {
