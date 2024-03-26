@@ -51,7 +51,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: linear-gradient(0deg, #CFE7F8, #85b5D9);
+  background: linear-gradient(0deg, #BAD9EF, #85b5D9);
   box-shadow: 3px 4px 10px rgba(0, 0, 0, 0.1);
 }
 
@@ -121,6 +121,7 @@ body {
 }
 
 .card {
+  font-size: 14px;
   position: relative;
   background-color: #E7F4FC;
   padding: 10px;
@@ -136,7 +137,7 @@ body {
   width: fit-content;
   background-color: white;
   border-radius: 10px;
-  font-size: 20px;
+  font-size: 18px;
 }
 
 .expand-minimize {

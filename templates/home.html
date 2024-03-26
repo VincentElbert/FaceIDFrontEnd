@@ -7,18 +7,6 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='page.css') }}"/>
   </head>
   <body>
-    <div class="navbar">
-      <div class="nav-items">
-        <img src="static/menu-icon.png" alt="Hamburger Icon" class="icon" />
-        <img src="static/face_defense_master_logo.png" alt="Web Logo" class="logo" />
-      </div>
-      <div class="nav-items">
-        <img id="logout-nav" src="static/logout-icon.png" alt="Logout Icon" class="icon" />
-        <img src="static/profile-icon.png" alt="Profile Icon" class="icon" />
-        <p>{{username}}</p>
-      </div>
-    </div>
-
     <div class="sidebar">
       <div class="side-items">
         <div class="menu-item">Account</div>
@@ -29,6 +17,17 @@
       <div class="side-items">
         <div class="menu-item">Settings</div>
         <div id="logout-menu" class="menu-item">Logout</div>
+      </div>
+    </div>
+    <div class="navbar">
+      <div class="nav-items">
+        <img src="static/menu-icon.png" alt="Hamburger Icon" class="icon" />
+        <img src="static/face_defense_master_logo.png" alt="Web Logo" class="logo" />
+      </div>
+      <div class="nav-items">
+        <img id="logout-nav" src="static/logout-icon.png" alt="Logout Icon" class="icon" />
+        <img src="static/profile-icon.png" alt="Profile Icon" class="icon" />
+        <p>{{username}}</p>
       </div>
     </div>
 
@@ -45,8 +44,11 @@
             &emsp;Total Connected Devices: ...
           </p>
 
-          <div class="devices-container">
-            <ul id="devices-list"></ul>
+          <div id="devices-container">
+            <img src="static/pc-icon.png" alt="PC Icon" class="icon">
+            <div class="device">
+                <h3>PC</h3>
+            </div>
           </div>
 
         </div>
@@ -54,7 +56,7 @@
         <div id="connected-apps" class="card">
           <img id="connected-apps-expand" src="static/expand.png" alt="Expand Icon" class="expand-minimize icon" />
           <h2>Connected Apps</h2>
-          <div class="apps-container">
+          <div id="apps-container">
             <div class="apps">Jira</div>
             <div class="apps">Teams</div>
 
@@ -70,11 +72,35 @@
     </div>
     <script>
       const connectionsData = JSON.parse('{{ connections|safe }}');
-      const devicesList = document.getElementById('devices-list');
+      const devicesContainer = document.getElementById('devices-container');
+      
       connectionsData.forEach(connection => {
-          const li = document.createElement('li');
-          li.textContent = connection.device;
-          devicesList.appendChild(li);
+        const device = document.createElement('div');
+        device.className = 'device';
+        
+        deviceName = connection.device;
+
+        if(deviceName === 'PC'){
+          const deviceImage = document.createElement('img');
+          deviceImage.src = 'static/pc-icon.png';
+          device.appendChild(deviceImage);
+        }
+        else if(deviceName === 'Mobile'){
+          const deviceImage = document.createElement('img');
+          deviceImage.src = 'static/mobile-icon.png';
+          device.appendChild(deviceImage);
+        }
+        else{
+          const deviceImage = document.createElement('img');
+          deviceImage.src = 'static/devices-icon.png';
+          device.appendChild(deviceImage);
+        }
+
+        const deviceh3 = document.createElement('h3');
+        deviceh3.textContent = deviceName;
+        device.appendChild(deviceh3);
+
+        devicesContaianer.appendChild(device);
       });
       var logoutMenu = document.getElementById('logout-menu');
       var logoutNav = document.getElementById('logout-nav');
