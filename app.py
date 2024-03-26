@@ -13,7 +13,9 @@ from models import db, User, Connection, LogEvent
 from concurrent.futures import ThreadPoolExecutor
 import random
 from sqlalchemy import text
+from sqlalchemy.orm.exc import NoResultFound
 from flask_mail import Mail, Message
+import json
 
 app = Flask(__name__)
 app.config['MAIL_SERVER'] = 'smtp.fastmail.com'
@@ -83,13 +85,12 @@ def home():
         return redirect(url_for('login'))
     username=session['username']
     user = db.session.execute(db.select(User).filter_by(email=username)).scalar_one()
-    return render_template('home.html', 
-                            username=username,
-                            # insert the devices here
-                            device=user.connections,
-                            # insert the log-in history
-                            history=user.logevent
-                            )
+    global user_agent
+    user_agent = parse(request.user_agent.string)
+    device=str(user_agent).split(' / ')[0],
+    connections = [serialize_connection(connection) for connection in user.connections]
+    histories = [serialize_connection(event) for event in user.logevent]
+    return render_template('home.html', username=username, connections=json.dumps(connections), histories=json.dumps(histories))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -327,6 +328,20 @@ def verification():
         recovery = request.args.get('recovery')
         return render_template('verification.html', email=email, recovery=recovery)
     
+def serialize_connection(connection):
+    return {
+        'cid': str(connection.cid),
+        'device': connection.device
+    }
+
+def serialize_history(event):
+    return {
+        'eid': str(event.eid),
+        'time': str(event.time),
+        'event_desc': event.event_desc,
+        'ip': event.ip,
+        'location': event.location
+    }
 
 
 # ... other route definitions ...
