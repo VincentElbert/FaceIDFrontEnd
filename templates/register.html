@@ -135,14 +135,18 @@
           <button id="login-btn">Continue</button>
       </div>
     </div>
-    <div id="register-fail-modal" class="modal">
-      <div class="modal-content">
-          <h2>Registration Fail!</h2>
-          <p>Please Make Sure You:</p>
-          <p>*Position your face directly in front of the camera and align it in the centre of the frame.</p>
-          <p>*have good lighting and a clear background.</p>
-          <button id="retry-btn">Retry</button>
+    <div id="register-fail-modal" class="Fail-modal">
+      <div class="Fail-modal-content">
+        <h2>Registration Fail!</h2>
+        <p>Please Make Sure You:</p>
+        <ul class="instructions">
+          <li>Position your face directly in front of the camera and align it in the centre of the frame.</li>
+          <li>Have good lighting and a clear background.</li>
+        </ul>
+        <img src="static\Animation--Fail.gif" alt="Fail Demo GIF">
+        <button id="retry-btn">Retry</button>
       </div>
+    </div>
     </div>
     <div id="processing-popup" class="modal" style="display: none;">
       <div class="modal-content" style="width: 300px;">
@@ -227,7 +231,7 @@
             const lastEightLetters = emailInput.value.substring(8, 0);
 
             const maskedEmail = firstFiveLetters + '*'.repeat(emailInput.value.length - 3 - 8) + lastEightLetters;
-            document.getElementById('user-email').textContent = maskedEmail;
+            document.getElementById('user-email').textContent = emailInput.value;
             const modal = document.getElementById('register-success-modal');
             modal.style.display = 'block';
 
