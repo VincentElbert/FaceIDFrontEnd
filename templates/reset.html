@@ -78,6 +78,14 @@
         <div class="error-message" id="password-error"></div>
         <input type="submit" value="Reset" />
       </form>
+      <div id="success-modal" class="modal">
+        <div class="modal-content">
+          <h2>Password Reset Successful!</h2>
+          <p>Your account is recovered and you can login to your account with the new password</p>
+          <button id="login-btn">Login</button>
+        </div>
+    </div>
+      
 
     <script>
       const resetPasswordForm = document.getElementById("reset-password-form");
@@ -88,6 +96,16 @@
       const passwordErrorPopup = document.getElementById(
         "password-error-popup"
       );
+
+      function showSuccessModal() {
+            const modal = document.getElementById('success-modal');
+            modal.style.display = 'block';
+
+            const loginBtn = document.getElementById('login-btn');
+            loginBtn.addEventListener('click', function() {
+                window.location.href = "/login";
+            });
+        }
 
       resetPasswordForm.addEventListener("submit", function (e) {
         e.preventDefault();
@@ -118,8 +136,7 @@
         })
             .then(response => {
             if (response.ok) {
-                alert("Password reset successful!");
-                window.location.href = "/login";
+                showSuccessModal();
             } else {
                 alert("Password reset failed. Please try again.");
             }

@@ -74,26 +74,24 @@
             <img src="static/eye_icon.png" alt="Show Password" class="icon" />
           </span>
         </div>
-        <input type="submit" value="Next" />
         <div class="error-message" id="password-error"></div>
+        <input type="submit" value="Next" />
       </form>
-      <div id="face-scan-registration" style="display: none">
-        <div id="face-scan-instructions"></div>
-        <div id="webcam-container">
-          <div id="webcam"></div>
-          <img
-            id="face-frame"
-            src="static/face_frame.png"
-            alt="face_frame"
-            style="display: none"
-          />
-          <img
-            id="arrow"
-            src="static/arrow.png"
-            alt="arrow"
-            style="display: none"
-          />
-        </div>
+      <div id="face-scan-instructions"></div>
+      <div id="webcam-container" style="display: none">
+        <div id="webcam"></div>
+        <img
+          id="face-frame"
+          src="static/face_frame.png"
+          alt="face_frame"
+          style="display: none"
+        />
+        <img
+          id="arrow"
+          src="static/arrow.png"
+          alt="arrow"
+          style="display: none"
+        />
       </div>
     </div>
     <p style="display: block" id="login-link">
@@ -129,6 +127,23 @@
     >
       Scan
     </button>
+    <div id="register-success-modal" class="modal">
+      <div class="modal-content">
+          <h2>Registration Successful!</h2>
+          <p>A verification code has sent to the following email:</p>
+          <p id="user-email" style="font-weight: bold;"></p>
+          <button id="login-btn">Continue</button>
+      </div>
+    </div>
+    <div id="register-fail-modal" class="modal">
+      <div class="modal-content">
+          <h2>Registration Fail!</h2>
+          <p>Please Make Sure You:</p>
+          <p>*Position your face directly in front of the camera and align it in the centre of the frame.</p>
+          <p>*have good lighting and a clear background.</p>
+          <button id="retry-btn">Retry</button>
+      </div>
+    </div>
 
     <script>
       const registrationForm = document.getElementById("registration-form");
@@ -140,8 +155,10 @@
       const passwordErrorPopup = document.getElementById(
         "password-error-popup"
       );
-      const faceScanRegistration = document.getElementById("face-scan-registration");
-      const faceScanInstructions = document.getElementById("face-scan-instructions");
+      const webcamContainer = document.getElementById("webcam-container");
+      const faceScanInstructions = document.getElementById(
+        "face-scan-instructions"
+      );
       const loginLink = document.getElementById("login-link");
       const webcam = document.getElementById("webcam");
       const scanHint = document.getElementById("scan-hint");
@@ -149,14 +166,6 @@
       const scanBtn = document.getElementById("scan-btn");
       const faceFrame = document.getElementById("face-frame");
       const arrow = document.getElementById("arrow");
-
-      webcam.addEventListener("load", function () {
-        // Enable the scanBtn when the webcam is attached and ready
-        scanBtn.disabled = false;
-      });
-      webcam.addEventListener("loadeddata", function () {
-        // Hide the loading indicator or perform any other necessary actions
-      });
 
       registrationForm.addEventListener("submit", function (e) {
         e.preventDefault();
@@ -184,7 +193,7 @@
 
         registrationForm.style.display = "none";
         loginLink.style.display = "none";
-        faceScanRegistration.style.display = "flex";
+        webcamContainer.style.display = "flex";
         scanBtn.style.display = "block";
         scanHint.style.display = "flex";
         progressBar[0].style.display = "block";
@@ -193,7 +202,31 @@
 
         startFaceScan();
       });
-      
+
+      function showSuccessModal() {
+            const firstFiveLetters = emailInput.value.substring(0, 5);
+
+            const maskedEmail = firstFiveLetters + '*'.repeat(emailInput.value.length - 5);
+            document.getElementById('user-email').textContent = emailInput.value;
+            const modal = document.getElementById('register-success-modal');
+            modal.style.display = 'block';
+
+            const loginBtn = document.getElementById('login-btn');
+            loginBtn.addEventListener('click', function() {
+                window.location.href = "/verification";
+            });
+        }
+
+      function showFailModal() {
+          const modal = document.getElementById('register-fail-modal');
+          modal.style.display = 'block';
+
+          const loginBtn = document.getElementById('retry-btn');
+          loginBtn.addEventListener('click', function() {
+              window.location.href = "/login";
+          });
+      }
+
       async function startFaceScan() {
         Webcam.set({
           width: 400,
@@ -203,7 +236,7 @@
           flip_horiz: true // Flip camera horizontally
         });
         Webcam.attach('#webcam');
-        
+
         const faceScanSteps = [
           "Position your face directly in front of the camera and align it in the centre of the frame.",
           "Turn your head to the right and align your face within the frame",
@@ -279,11 +312,12 @@
           body: formData,
         });
 
-        if (response.ok) {
-          alert("Registration successful!");
-          window.location.href = "/verification";
+        const data = await response.json();
+
+        if (data.message === 'Registration successful!') {
+          showSuccessModal();
         } else {
-          alert("Registration failed. Please try again.");
+          alert('Registration Fail!!!');
         }
       }
 
