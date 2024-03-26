@@ -375,6 +375,12 @@ input[type="password"] {
   margin-bottom: 10px;
 }
 
+.modal-content img {
+  display: block;
+  margin: 0 auto;
+  max-width: 70%;
+}
+
 #countdown {
   font-size: 36px;
   font-weight: bold;
@@ -403,4 +409,79 @@ input[type="password"] {
   cursor: pointer;
   font-size: 18px;
   border-radius: 5px;
+}
+
+.processing-popup-window {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.processing-popup-window-content {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 5px;
+  text-align: center;
+}
+
+.Fail-modal {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+.Fail-modal-content {
+  background-color: #fefefe;
+  margin: 15% auto;
+  padding: 30px;
+  border: 1px solid #888;
+  width: 600px;
+  text-align: center;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  animation: popUp 0.4s ease-in-out;
+}
+
+.Fail-modal-content img {
+  display: block;
+  margin: 0 auto;
+  max-width: 140%;
+}
+
+.Fail-modal-content p {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.Fail-modal-content h2 {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.instructions {
+  text-align: left;
+  list-style-type: none;
+  padding-left: 20px;
+}
+
+.instructions li {
+  margin-bottom: 10px;
+}
+
+.instructions li::before {
+  content: "*";
+  margin-right: 5px;
 }
