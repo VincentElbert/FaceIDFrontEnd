@@ -89,9 +89,6 @@ def home():
         return redirect(url_for('login'))
     username=session['username']
     user = db.session.execute(db.select(User).filter_by(email=username)).scalar_one()
-    global user_agent
-    user_agent = parse(request.user_agent.string)
-    device=str(user_agent).split(' / ')[0],
     connections = [serialize_connection(connection) for connection in user.connections]
     histories = [serialize_history(event) for event in user.logevent]
     return render_template('home.html', username=username, connections=json.dumps(connections), histories=json.dumps(histories))
@@ -118,6 +115,7 @@ def login():
                     location=ip_handler.getDetails(request.remote_addr).country_name
                         if hasattr(ip_handler.getDetails(request.remote_addr), "country_name")
                         else "Location Undetectable",
+                    device=": ".join(str(user_agent).split(' / ')[:1]),
                 )
                 user.logevent.append(new_failed_login)
                 db.session.add(new_failed_login)
@@ -170,6 +168,7 @@ def faceID():
                 location=ip_handler.getDetails(request.remote_addr).country_name
                 if hasattr(ip_handler.getDetails(request.remote_addr), "country_name")
                 else "Location Undetectable",
+                device=": ".join(str(user_agent).split(' / ')[:1]),
             )
             user.logevent.append(new_login)
             db.session.add(new_login)
@@ -184,6 +183,7 @@ def faceID():
                 location=ip_handler.getDetails(request.remote_addr).country_name
                 if hasattr(ip_handler.getDetails(request.remote_addr), "country_name")
                 else "Location Undetectable",
+                device=": ".join(str(user_agent).split(' / ')[:1]),
             )
             user.logevent.append(new_failed_login)
             db.session.add(new_failed_login)
@@ -347,6 +347,7 @@ def verification():
                     location=ip_handler.getDetails(request.remote_addr).country_name
                     if hasattr(ip_handler.getDetails(request.remote_addr), "country_name")
                     else "Location Undetectable",
+                    device=": ".join(str(user_agent).split(' / ')[:1]),
                 )
 
                 try:
@@ -496,10 +497,11 @@ def serialize_connection(connection):
 def serialize_history(event):
     return {
         'eid': str(event.eid),
+        'device': event.device,
         'time': str(event.time),
-        'event_desc': event.event_desc,
         'ip': event.ip,
-        'location': event.location
+        'location': event.location,
+        'event_desc': event.event_desc
     }
 
 

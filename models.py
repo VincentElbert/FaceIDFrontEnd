@@ -41,3 +41,4 @@ class LogEvent(Base):
     event_desc: Mapped[str]
     ip: Mapped[str]
     location: Mapped[str]
+    device: Mapped[str]

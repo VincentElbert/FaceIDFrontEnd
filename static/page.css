@@ -2,9 +2,9 @@
 
 :root {
   --navbar-padding: 10px;
-  --navbar-height: 50px;
+  --navbar-height: 40px;
   --sidebar-padding: 30px;
-  --sidebar-width: 200px;
+  --sidebar-width: 180px;
   --content-padding: 30px;
 }
 
@@ -126,13 +126,16 @@ body {
   background-color: #E7F4FC;
   padding: 10px;
   border-radius: 20px;
+  overflow: hidden;
 }
 
 .card.full-row {
   grid-column: 1 / span 2;
 }
 
+
 .card h2 {
+  margin-bottom: 5px;
   padding: 3px 5px;
   width: fit-content;
   background-color: white;
@@ -140,9 +143,71 @@ body {
   font-size: 18px;
 }
 
+.card p {
+  margin-left: 10px;
+  margin-bottom: 10px;
+}
+
 .expand-minimize {
   cursor: pointer;
   position: absolute;
   top: 15px;
   right: 5px;
+}
+
+.device {
+  position: relative;
+  left: -10px;
+  width: 100%;
+  background: linear-gradient(90deg, #DFF0FC, #D2E2EE);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 0px 10px;
+  box-shadow: 3px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.device img {
+  width: 80px;
+}
+
+#apps-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 20px;
+  padding: 0px 30px;
+}
+
+.app {
+  position: relative;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.app img {
+  width: 80px;
+}
+
+table {
+  position: relative;
+  width: calc(100% + 40px);
+  left: -20px;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+th, td {
+  text-align: left;
+}
+
+th {
+  padding: 8px 20px;
+  background-color: #B0C6D6;
+}
+
+td {
+  padding: 2px 20px;
 }
