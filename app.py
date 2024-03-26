@@ -1,4 +1,5 @@
 # app.py
+import datetime
 
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -8,7 +9,7 @@ from user_agents import parse
 from inference import infer, loginInfer
 from face_to_encoding import encodeSet, encodeByPerson, checkValidCamInput
 from train import train
-from models import db, User, Connection
+from models import db, User, Connection, LogEvent
 from concurrent.futures import ThreadPoolExecutor
 import random
 from sqlalchemy import text
@@ -85,9 +86,9 @@ def home():
     return render_template('home.html', 
                             username=username,
                             # insert the devices here
-                            device=user.connections
-                            # insert the apps
+                            device=user.connections,
                             # insert the log-in history
+                            history=user.logevent
                             )
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -96,14 +97,25 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        print(ip_handler.getDetails(request.remote_addr).country_name)
 
-        if db.session.query(User.email).filter_by(email=username).scalar() is not None:
+        if db.session.query(User.email).filter_by(email=username).scalar():
             hashed_pw = db.session.execute(db.select(User).filter_by(email=username)).scalar_one().password
             if check_password_hash(hashed_pw, password):
                 session['username'] = username
                 return redirect(url_for('faceID'))
             else:
+                user = db.session.execute(db.select(User).filter_by(email=username)).scalar_one()
+                new_failed_login = LogEvent(
+                    time=datetime.datetime.now(),
+                    event_desc="Login Failed - Incorrect Password",
+                    ip=request.remote_addr,
+                    location=ip_handler.getDetails(request.remote_addr).country_name
+                        if hasattr(ip_handler.getDetails(request.remote_addr), "country_name")
+                        else "Location Undetectable",
+                )
+                user.logevent.append(new_failed_login)
+                db.session.add(new_failed_login)
+                db.session.commit()
                 flash('Invalid username or password!')
         else:
             flash('Invalid username or password!')
@@ -119,6 +131,7 @@ def faceID():
         if 'username' not in session:
             return redirect(url_for('login'))
         username = session['username']
+        user = db.session.execute(db.select(User).filter_by(email=username)).scalar_one()
 
         frames = []
         for i in range(len(request.files)):
@@ -128,8 +141,30 @@ def faceID():
         if (result != None and result[0] == username):
             print('Face recognized for '+ username)
             session['authenticated'] = True
+            new_login = LogEvent(
+                time=datetime.datetime.now(),
+                event_desc="Login Success",
+                ip=request.remote_addr,
+                location=ip_handler.getDetails(request.remote_addr).country_name
+                if hasattr(ip_handler.getDetails(request.remote_addr), "country_name")
+                else "Location Undetectable",
+            )
+            user.logevent.append(new_login)
+            db.session.add(new_login)
+            db.session.commit()
             return jsonify({'redirect': url_for('home')})  # Return JSON response with redirect URL
         else:
+            new_failed_login = LogEvent(
+                time=datetime.datetime.now(),
+                event_desc="Login Failed - Failed Face Recognition",
+                ip=request.remote_addr,
+                location=ip_handler.getDetails(request.remote_addr).country_name
+                if hasattr(ip_handler.getDetails(request.remote_addr), "country_name")
+                else "Location Undetectable",
+            )
+            user.logevent.append(new_failed_login)
+            db.session.add(new_failed_login)
+            db.session.commit()
             print('Face not recognized')
             return jsonify({'message': 'Face not recognized. Please Try Again'})  # Return JSON response with message
     else:
@@ -263,11 +298,20 @@ def verification():
                     password=generate_password_hash(password),
                 )
                 new_user_connection = Connection(
-                    device=str(user_agent).split(' / ')[0],
+                    device=": ".join(str(user_agent).split(' / ')[:1]),
+                )
+                new_creation = LogEvent(
+                    time=datetime.datetime.now(),
+                    event_desc="Create Account",
+                    ip=request.remote_addr,
+                    location=ip_handler.getDetails(request.remote_addr).country_name
+                    if hasattr(ip_handler.getDetails(request.remote_addr), "country_name")
+                    else "Location Undetectable",
                 )
                 new_user.connections.append(new_user_connection)
                 db.session.add(new_user)
                 db.session.add(new_user_connection)
+                db.session.add(new_creation)
                 db.session.commit()
                 
                 return {'success': 'true', 'recovery': 'false'}
