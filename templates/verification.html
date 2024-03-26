@@ -18,7 +18,6 @@
             {% set email_parts = email.split('@') %}
             <p>User recognized for: {{ email_parts[0][:2] }}***{{ email_parts[0][-2:] }}@{{ email_parts[1] }}</p>
         {% else %}
-            <p>Please enter the verification code:</p>
         {% endif %}
 
         <form id="verification-form">
@@ -28,10 +27,44 @@
             <input type="text" id="verification_code" name="verification_code" maxlength="6" required>
             <input type="submit" value="Verify">
         </form>
+        <p id="resend-text">Can not receive? Click <a href="#" id="resend-link">here</a> to resend</p>
         <div class="error-message" id="message"></div>
+    </div>
+    <div id="success-modal" class="modal">
+        <div class="modal-content">
+            <h2>Activation Successful!</h2>
+            <p>Welcome to Face Defense Master!</p>
+            <p>Your account is activated and you will be redirected to the login page in:</p>
+            <p><span id="countdown">10</span> seconds.</p>
+            <button id="login-btn">Login</button>
+        </div>
+    </div>
     </div>
     
     <script>
+
+        function showSuccessModal() {
+            const modal = document.getElementById('success-modal');
+            modal.style.display = 'block';
+
+            const loginBtn = document.getElementById('login-btn');
+            loginBtn.addEventListener('click', function() {
+                window.location.href = "/login";
+            });
+
+            let countdown = 10;
+            const countdownElement = document.getElementById('countdown');
+            const countdownTimer = setInterval(function() {
+                countdown--;
+                countdownElement.textContent = countdown;
+
+                if (countdown <= 0) {
+                    clearInterval(countdownTimer);
+                    window.location.href = "/login";
+                }
+            }, 1000);
+        }
+
         document.getElementById('verification-form').addEventListener('submit', async function(event) {
             event.preventDefault();
 
@@ -53,8 +86,7 @@
             console.log(recovery);
             const data = await response.json();
             if (data.success == 'true' && data.recovery == 'false' ) {
-                alert("Activation successful!");
-                window.location.href = "/login";
+                showSuccessModal();
             } else if(data.success == 'true' && data.recovery == 'true') {
                 var urlParams = new URLSearchParams(window.location.search);
                 var user_email = urlParams.get('email');
@@ -64,6 +96,52 @@
                 window.location.href = resetURL;
             } else {document.getElementById('message').textContent = data.message}
         })
+
+        document.getElementById('resend-link').addEventListener('click', async function(event) {
+            event.preventDefault();
+            startCountdown();
+            const email = document.getElementsByName('email')[0].value;
+
+            const response = await fetch("/resend_verification", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email: email }),
+            });
+        });
+
+        function startCountdown() {
+            const resendText = document.getElementById('resend-text');
+            resendText.innerHTML = 'Resend in <span id="resend_countdown">60</span> seconds';
+
+            let resend_countdown = 60;
+            const resend_countdownTimer = setInterval(function() {
+                resend_countdown--;
+                document.getElementById('resend_countdown').textContent = resend_countdown;
+
+                if (resend_countdown <= 0) {
+                    clearInterval(resend_countdownTimer);
+                    resendText.innerHTML = 'Can not receive? Click <a href="#" id="resend-link">here</a> to resend';
+                    document.getElementById('resend-link').addEventListener('click', async function(event) {
+                        event.preventDefault();
+                        startCountdown();
+                        const email = document.getElementsByName('email')[0].value;
+
+                        const response = await fetch("/resend_verification", {
+                            method: "POST",
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ email: email }),
+                        });
+
+                        
+                    });
+                }
+            }, 1000);
+        }
+
     </script>
 </body>
 </html>
