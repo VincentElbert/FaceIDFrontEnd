@@ -4,8 +4,8 @@
   --navbar-padding: 10px;
   --navbar-height: 40px;
   --sidebar-padding: 30px;
-  --sidebar-width: 180px;
-  --content-padding: 30px;
+  --sidebar-width: 120px;
+  --content-padding: 20px;
 }
 
 * {
@@ -15,6 +15,7 @@
 
 body {
   font-family: "Poppins", sans-serif;
+  font-size: 12px;
   background: linear-gradient(0deg, #85b5D9, #CFE7F8);
 }
 
@@ -52,7 +53,7 @@ body {
   align-items: center;
   justify-content: space-between;
   background: linear-gradient(0deg, #BAD9EF, #85b5D9);
-  box-shadow: 3px 4px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.1);
 }
 
 .navbar .nav-items {
@@ -78,17 +79,25 @@ body {
 
 .sidebar {
   position: fixed;
+  text-wrap: nowrap;
+  overflow: hidden;
   top: calc(var(--navbar-height) + 2 * var(--navbar-padding));
   left: 0;
   width: var(--sidebar-width);
   height: calc(100% - (var(--navbar-height) + 2 * var(--navbar-padding) + 2 * var(--sidebar-padding)));
   padding: var(--sidebar-padding);
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   background: linear-gradient(0deg, #397BAD, #CFE7F8);
   box-shadow: 10px 4px 10px rgba(0, 0, 0, 0.1);
+  transition: width 0.3s ease-in-out;
+}
+
+.sidebar-hidden {
+  transition: width 0.3s ease-in-out;
+  overflow: hidden;
+  visibility: hidden;
 }
 
 .sidebar .side-items {
@@ -103,6 +112,7 @@ body {
 }
 
 .content {
+  overflow: hidden;
   width: 100vw;
   height: 100vh;
 }
@@ -115,18 +125,23 @@ body {
   height: calc(100% - (var(--navbar-height) + 2 * var(--navbar-padding) + 2 * var(--content-padding)));
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-gap: 30px;
+  grid-gap: 10px;
   padding: var(--content-padding);
   background-color: transparent;
+  transition: left 0.3s ease-in-out;
 }
 
 .card {
-  font-size: 14px;
   position: relative;
   background-color: #E7F4FC;
   padding: 10px;
   border-radius: 20px;
   overflow: hidden;
+  transition: width 0.3s ease-in-out;
+}
+
+.card-enlarge {
+  width: 80vw;
 }
 
 .card.full-row {
@@ -140,12 +155,17 @@ body {
   width: fit-content;
   background-color: white;
   border-radius: 10px;
-  font-size: 18px;
+  font-size: 16px;
 }
 
 .card p {
   margin-left: 10px;
   margin-bottom: 10px;
+}
+
+.container {
+  overflow-y: scroll;
+  overflow-x: hidden;
 }
 
 .expand-minimize {
