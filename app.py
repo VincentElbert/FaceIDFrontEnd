@@ -110,7 +110,7 @@ def login():
             else:
                 user = db.session.execute(db.select(User).filter_by(email=username)).scalar_one()
                 new_failed_login = LogEvent(
-                    time=datetime.datetime.now(),
+                    time=datetime.now(),
                     event_desc="Login Failed - Incorrect Password",
                     ip=request.remote_addr,
                     location=ip_handler.getDetails(request.remote_addr).country_name
@@ -161,7 +161,7 @@ def faceID():
             print('Face recognized for '+ username)
             session['authenticated'] = True
             new_login = LogEvent(
-                time=datetime.datetime.now(),
+                time=datetime.now(),
                 event_desc="Login Success",
                 ip=request.remote_addr,
                 location=ip_handler.getDetails(request.remote_addr).country_name
@@ -174,7 +174,7 @@ def faceID():
             return jsonify({'redirect': url_for('home')})  # Return JSON response with redirect URL
         else:
             new_failed_login = LogEvent(
-                time=datetime.datetime.now(),
+                time=datetime.now(),
                 event_desc="Login Failed - Failed Face Recognition",
                 ip=request.remote_addr,
                 location=ip_handler.getDetails(request.remote_addr).country_name
@@ -385,7 +385,7 @@ def verification():
                     device=": ".join(str(user_agent).split(' / ')[:1]),
                 )
                 new_creation = LogEvent(
-                    time=datetime.datetime.now(),
+                    time=datetime.now(),
                     event_desc="Create Account",
                     ip=request.remote_addr,
                     location=ip_handler.getDetails(request.remote_addr).country_name
@@ -400,6 +400,7 @@ def verification():
                     pass
                     
                 new_user.connections.append(new_user_connection)
+                new_user.logevent.append(new_creation)
                 db.session.add(new_user)
                 db.session.add(new_user_connection)
                 db.session.add(new_creation)
