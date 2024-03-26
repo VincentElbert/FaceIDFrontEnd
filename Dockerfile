@@ -17,6 +17,7 @@ COPY face_to_encoding.py .
 COPY inference.py .
 COPY requirements.txt .
 COPY train.py .
+COPY models.py .
 
 # Build runtime image
 FROM python:3.12 AS run

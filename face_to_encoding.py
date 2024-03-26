@@ -23,8 +23,10 @@ def encodeByPerson(imgpath):
     # Get the face encodings for the face in each image file
     img = Image.open(imgpath)
     img_arr = np.array(img)
-    if checkFace(img_arr):
-        encoding = face_recognition.face_encodings(img_arr)[0]
+    face_locations = face_recognition.face_locations(img_arr)
+
+    if len(face_locations) == 1:
+        encoding = face_recognition.face_encodings(img_arr, face_locations)[0]
         return  ":" + ",".join(str(val) for val in encoding)
 
 def checkFace(imgpath):
