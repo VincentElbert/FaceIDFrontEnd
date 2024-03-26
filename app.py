@@ -12,7 +12,9 @@ from models import db, User, Connection
 from concurrent.futures import ThreadPoolExecutor
 import random
 from sqlalchemy import text
+from sqlalchemy.orm.exc import NoResultFound
 from flask_mail import Mail, Message
+import json
 
 app = Flask(__name__)
 app.config['MAIL_SERVER'] = 'smtp.fastmail.com'
@@ -78,7 +80,13 @@ def index():
 def home():
     if 'username' not in session or not session.get('authenticated', False):
         return redirect(url_for('login'))
-    return render_template('home.html', username=session['username'])
+    username=session['username']
+    user = db.session.execute(db.select(User).filter_by(email=username)).scalar_one()
+    global user_agent
+    user_agent = parse(request.user_agent.string)
+    device=str(user_agent).split(' / ')[0],
+    connections = [serialize_connection(connection) for connection in user.connections]
+    return render_template('home.html', username=username, connections=json.dumps(connections))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -272,7 +280,11 @@ def verification():
         recovery = request.args.get('recovery')
         return render_template('verification.html', email=email, recovery=recovery)
     
-
+def serialize_connection(connection):
+    return {
+        'cid': str(connection.cid),
+        'device': connection.device
+    }
 
 # ... other route definitions ...
 

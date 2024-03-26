@@ -46,12 +46,7 @@
           </p>
 
           <div class="devices-container">
-            <div class="device">
-              device a
-            </div>
-            <div class="device">
-              device b
-            </div>
+            <ul id="devices-list"></ul>
           </div>
 
         </div>
@@ -74,6 +69,13 @@
       </div>
     </div>
     <script>
+      const connectionsData = JSON.parse('{{ connections|safe }}');
+      const devicesList = document.getElementById('devices-list');
+      connectionsData.forEach(connection => {
+          const li = document.createElement('li');
+          li.textContent = connection.device;
+          devicesList.appendChild(li);
+      });
       var logoutMenu = document.getElementById('logout-menu');
       var logoutNav = document.getElementById('logout-nav');
       
@@ -89,7 +91,7 @@
       });
 
       connectedDevicesExpand.addEventListener('click', function(){
-        
+
       });
     </script>
   </body>
