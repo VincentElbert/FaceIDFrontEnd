@@ -385,8 +385,9 @@ def verification():
                     device=": ".join(str(user_agent).split(' / ')[:1]),
                 )
                 new_creation = LogEvent(
-                    time=datetime.datetime.now(),
+                    time=datetime.now(),
                     event_desc="Create Account",
+                    user_email = email,
                     ip=request.remote_addr,
                     location=ip_handler.getDetails(request.remote_addr).country_name
                     if hasattr(ip_handler.getDetails(request.remote_addr), "country_name")
