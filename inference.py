@@ -18,7 +18,7 @@ def infer(img_buffer):
             p = clf.predict_proba(face_enc.reshape(1, -1))
             print(p)
             label_i = np.argmax(p, axis=1)
-            if p[0][label_i] >= 0.95:
+            if p[0][label_i] >= 0.9:
                 return clf.predict(face_enc.reshape(1, -1))
             else:
                 return "No Match"
