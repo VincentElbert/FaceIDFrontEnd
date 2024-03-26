@@ -38,6 +38,7 @@ user_info = {
     "Justin_Sun": generate_password_hash("password123"),
 }
 
+
 mail = Mail(app)
 ipinfo_token = "3fcc779048091b"
 ip_handler = ipinfo.getHandler(ipinfo_token)
@@ -84,7 +85,7 @@ def index():
 
 @app.route('/home')
 def home():
-    if 'username' not in session or not session.get('authenticated', False):
+    if 'username' not in session or not session.get('authenticated', False) or not db.session.query(User.email).filter_by(email=session['username']).scalar():
         return redirect(url_for('login'))
     username=session['username']
     user = db.session.execute(db.select(User).filter_by(email=username)).scalar_one()
@@ -211,10 +212,6 @@ def recoveryFaceID():
             user_info[email]['Recoverying'] = True
             print(verification_code)
             send_email(email,verification_code)
-            # email_string = "Please enter the following code for verification to proceed to password reset: " + str(verification_code)
-            # msg = Message('Reset Password', sender='team1test@fastmail.com', recipients=[result[0]])
-            # msg.body = email_string
-            # mail.send(msg)
             response = {
                 'redirect': url_for('verification'),
                 'email': email,
@@ -267,52 +264,7 @@ def register():
                         file.write("\n")
                         file.write("\n".join([email + encoding for encoding in encodings]))
                     train(app.config['ENCODINGS_PATH'])
-                    email_string = """
-                    <html>
-                    <head>
-                        <style>
-                            body {{
-                                font-family: Arial, sans-serif;
-                                background-color: #f4f4f4;
-                                padding: 20px;
-                            }}
-                            h1 {{
-                                color: #333333;
-                                text-align: center;
-                            }}
-                            p {{
-                                color: #666666;
-                                line-height: 1.5;
-                            }}
-                            .code {{
-                                font-size: 24px;
-                                font-weight: bold;
-                                color: #ff6600;
-                                text-align: center;
-                                margin: 20px 0;
-                            }}
-                            .expiration {{
-                                color: #999999;
-                                text-align: center;
-                            }}
-                            .simpletext {{
-                                text-align: center;
-                            }}
-                        </style>
-                    </head>
-                    <body>
-                        <h1>Welcome to Face Defense Master!</h1>
-                        <p class="simpletext" >Thank you for registering with us. Please enter the following code to activate your account:</p>
-                        <div class="code">{verification_code}</div>
-                        <p class="expiration">The code will expire in 5 minutes.</p>
-                        <p class="simpletext">If you have any questions or need assistance, feel free to contact our support team.</p>
-                    </body>
-                    </html>
-                    """
-                    msg = Message('Registration Confirmation', sender='team1test@fastmail.com', recipients=[email])
-                    msg.html = email_string.format(verification_code=verification_code)
-                    mail.send(msg)
-
+                    send_email(email_waitfor_verify,verification_code)
                     print("User info after registration:")
                     print(user_info)
                     print(email)
@@ -527,53 +479,6 @@ def resend_verification():
         user_info[email_waitfor_verify]['timestamp'] = timestamp  # Add the timestamp to the existing user_info[email] dictionary
         print(user_info)
         send_email(email_waitfor_verify,verification_code)
-        # email_string = """
-        # <html>
-        # <head>
-        #     <style>
-        #         body {{
-        #             font-family: Arial, sans-serif;
-        #             background-color: #f4f4f4;
-        #             padding: 20px;
-        #         }}
-        #         h1 {{
-        #             color: #333333;
-        #             text-align: center;
-        #         }}
-        #         p {{
-        #             color: #666666;
-        #             line-height: 1.5;
-        #         }}
-        #         .code {{
-        #             font-size: 24px;
-        #             font-weight: bold;
-        #             color: #ff6600;
-        #             text-align: center;
-        #             margin: 10px 0;
-        #         }}
-        #         .expiration {{
-        #             color: #999999;
-        #             text-align: center;
-        #         }}
-        #         .simpletext {{
-        #             text-align: center;
-        #         }}
-        #     </style>
-        # </head>
-        # <body>
-        #     <h1>Welcome to Face Defense Master!</h1>
-        #     <p class="simpletext" >Thank you for registering with us. Please enter the following code to activate your account:</p>
-        #     <div class="code">{verification_code}</div>
-        #     <p class="expiration">The code will expire in 5 minutes.</p>
-        #     <p class="simpletext">If you have any questions or need assistance, feel free to contact our support team.</p>
-        # </body>
-        # </html>
-        # """
-        # msg = Message('Registration Confirmation', sender='team1test@fastmail.com', recipients=[email_waitfor_verify])
-        # msg.html = email_string.format(verification_code=verification_code)
-        # mail.send(msg)
-
-        
         return render_template('verification.html')
     else:
         return render_template('verification.html')
