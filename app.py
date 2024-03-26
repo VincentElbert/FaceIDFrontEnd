@@ -92,7 +92,7 @@ def home():
     user_agent = parse(request.user_agent.string)
     device=str(user_agent).split(' / ')[0],
     connections = [serialize_connection(connection) for connection in user.connections]
-    histories = [serialize_connection(event) for event in user.logevent]
+    histories = [serialize_history(event) for event in user.logevent]
     return render_template('home.html', username=username, connections=json.dumps(connections), histories=json.dumps(histories))
 
 @app.route('/login', methods=['GET', 'POST'])
