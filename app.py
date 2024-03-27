@@ -27,6 +27,7 @@ app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 app.config['MAIL_USERNAME'] = 'facedefensemaster@fastmail.com'
 app.config['MAIL_PASSWORD'] = '75q5cyy7nemdus8h'
+#app.config['MAIL_USERNAME'] = 'team1test@fastmail.com'
 # app.config['MAIL_PASSWORD'] = '85jj5xcqfy3ypk3q'
 
 # Secret key for sessions
