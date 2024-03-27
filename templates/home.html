@@ -58,7 +58,7 @@
               Teams
             </div>
 
-            <div class="app">
+            <div id="add-app" class="app">
               <img src="static/add-icon.png" alt="Add Icon">
               + Add apps
             </div>
@@ -68,13 +68,14 @@
         </div>
         <div id="login-history" class="card full-row">
           <h2 id="login-history-title">Log-in History</h2>
-          <div class="table-container" class="container">
+          <div id="table-container" class="container">
             <table>
               <thead>
                 <tr>
                   <th>Device</th>
                   <th>Date & Time</th>
                   <th>Location</th>
+                  <th>Status</th>
                   <th>Event</th>
                 </tr>
               </thead>
@@ -138,6 +139,9 @@
         const dateTime = history.time;
         const location = history.location;
         const event = history.event_desc;
+        const status = event.startsWith("Login Failed")
+          ? '<img src="static/cross-icon.png" alt="Cross Icon" class="icon">'
+          : '<img src="static/tick-icon.png" alt="Tick Icon" class="icon">';
 
         const row = document.createElement('tr');
         const deviceCell = document.createElement('td');
@@ -152,8 +156,15 @@
         locationCell.textContent = location;
         row.appendChild(locationCell);
 
+        const statusCell = document.createElement('td');
+        statusCell.innerHTML = status;
+        row.appendChild(statusCell);
+
         const eventCell = document.createElement('td');
         eventCell.textContent = event;
+        if (event.startsWith("Login Failed")) {
+          eventCell.style.color = "red";
+        }
         row.appendChild(eventCell);
 
         historyTableBody.appendChild(row);
