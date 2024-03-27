@@ -38,7 +38,6 @@ user_info = {
     "Justin_Sun": generate_password_hash("password123"),
 }
 
-
 mail = Mail(app)
 ipinfo_token = "3fcc779048091b"
 ip_handler = ipinfo.getHandler(ipinfo_token)
@@ -209,6 +208,8 @@ def recoveryFaceID():
         result = infer(frames[0].stream)
         if (result != None and str(result[0]) != "N" and result[0]):
             email = str(result[0])
+            global email_waitfor_verify
+            email_waitfor_verify = email
             print('Result is: --------------------- ' + str(result))
             print('Face recognized for '+ str(result[0]))
             user_info[email]['verification_code'] = verification_code
@@ -397,7 +398,7 @@ def verification():
 def send_email(email_waitfor_verify, verification_code):
     try:
         if user_info[email_waitfor_verify]['Recoverying']:
-            print('code for Recoveryinging sending')
+            print('code for Recoveryinging sending    ' + email_waitfor_verify)
             email_string = """
             <html>
             <head>
@@ -468,8 +469,9 @@ def send_email(email_waitfor_verify, verification_code):
             msg = Message('Reset Password', sender='team1test@fastmail.com', recipients=[email_waitfor_verify])
             msg.html = email_string.format(verification_code=verification_code)
             mail.send(msg)
-            print("Code for account recovery sent")
+            print("Code for account recovery sent to:        " + email_waitfor_verify)
     except KeyError:
+        print('code for Account Recovery sending to:         ' + email_waitfor_verify)
         email_string = """
         <html>
         <head>
@@ -540,7 +542,7 @@ def send_email(email_waitfor_verify, verification_code):
         msg = Message('Registration Confirmation', sender='team1test@fastmail.com', recipients=[email_waitfor_verify])
         msg.html = email_string.format(verification_code=verification_code)
         mail.send(msg)
-        print("Code for account registration sent")
+        print("Code for account registration sent to:     " + email_waitfor_verify)
 
 
 @app.route('/resend_verification', methods=['GET', 'POST'])
