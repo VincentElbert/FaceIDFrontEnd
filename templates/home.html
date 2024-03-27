@@ -35,7 +35,7 @@
       <div class="cards">
 
         <div id="connected-devices" class="card">
-          <h2>Connected Devices</h2>
+          <h2 id="connected-devices-title">Connected Devices</h2>
           <p id="total-devices">
             Total Connected Devices: (Cannot fetch total devices)
           </p>
@@ -47,7 +47,7 @@
         </div>
 
         <div id="connected-apps" class="card">
-          <h2>Connected Apps</h2>
+          <h2 id="connected-apps-title">Connected Apps</h2>
           <div id="apps-container" class="container">
             <div class="app">
               <img src="static/Jira.png" alt="Jira">
@@ -67,7 +67,7 @@
           <img id="connected-apps-expand" src="static/expand.png" alt="Expand" class="expand-minimize icon">
         </div>
         <div id="login-history" class="card full-row">
-          <h2>Log-in History</h2>
+          <h2 id="login-history-title">Log-in History</h2>
           <div class="table-container" class="container">
             <table>
               <thead>
@@ -103,6 +103,10 @@
       const connectedDevicesExpand = document.getElementById('connected-devices-expand');
       const connectedAppsExpand = document.getElementById('connected-apps-expand');
       const loginHistoryExpand = document.getElementById('login-history-expand');
+
+      const connectedDevicesTitle = document.getElementById('connected-devices-title');
+      const connectedAppsTitle = document.getElementById('connected-apps-title');
+      const loginHistoryTitle = document.getElementById('login-history-title');
       
       const connectedDevicesSidebar =document.getElementById('connected-devices-sidebar')
       const connectedAppsSidebar =document.getElementById('connected-apps-sidebar')
@@ -169,6 +173,9 @@
       connectedDevicesExpand.addEventListener('click', function() {
         expandFunction('connected-devices');
       });
+      connectedDevicesTitle.addEventListener('click', function() {
+        expandFunction('connected-devices');
+      })
       connectedDevicesSidebar.addEventListener('click', function() {
         expandFunction('connected-devices');
       });
@@ -176,11 +183,17 @@
       connectedAppsExpand.addEventListener('click', function() {
         expandFunction('connected-apps');
       });
+      connectedAppsTitle.addEventListener('click', function() {
+        expandFunction('connected-apps');
+      });
       connectedAppsSidebar.addEventListener('click', function() {
         expandFunction('connected-apps');
       });
 
       loginHistoryExpand.addEventListener('click', function() {
+        expandFunction('login-history');
+      });
+      loginHistoryTitle.addEventListener('click', function() {
         expandFunction('login-history');
       });
       loginHistorySidebar.addEventListener('click', function() {

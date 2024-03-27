@@ -120,7 +120,7 @@ body {
 }
 
 .side-item:hover {
-  font-size: larger;
+  font-size: 13px;
   background-color: #f0f0f0;
 }
 
@@ -174,12 +174,18 @@ body {
 
 
 .card h2 {
+  cursor: pointer;
   margin-bottom: 5px;
   padding: 3px 5px;
   width: fit-content;
   background-color: white;
   border-radius: 10px;
   font-size: 16px;
+  transition: font-size 0.3s ease-in-out;
+}
+
+.card h2:hover {
+  font-size: 15px;
 }
 
 .card p {
@@ -197,6 +203,11 @@ body {
   position: absolute;
   top: 15px;
   right: 5px;
+}
+
+.expand-minimize:hover {
+  width:18px;
+  height:18px;
 }
 
 .device {
