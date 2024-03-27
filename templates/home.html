@@ -8,15 +8,15 @@
   </head>
   <body>
     <div class="sidebar">
-      <div class="side-items">
-        <div class="menu-item">Account</div>
-        <div id="login-history-sidebar" class="menu-item">Log-in History</div>
-        <div id="connected-devices-sidebar" class="menu-item">Connected Devices</div>
-        <div id="connected-apps-sidebar" class="menu-item">Connected Apps</div>
+      <div class="side-items-container">
+        <div class="side-item">Account</div>
+        <div id="login-history-sidebar" class="side-item">Log-in History</div>
+        <div id="connected-devices-sidebar" class="side-item">Connected Devices</div>
+        <div id="connected-apps-sidebar" class="side-item">Connected Apps</div>
       </div>
-      <div class="side-items">
-        <div class="menu-item">Settings</div>
-        <div id="logout-menu" class="menu-item">Logout</div>
+      <div class="side-items-container">
+        <div class="side-item">Settings</div>
+        <div id="logout-menu" class="side-item">Logout</div>
       </div>
     </div>
     <div class="navbar">
@@ -208,6 +208,7 @@
       }
 
       function expandFunction(id){
+        const expandElement = document.getElementById(`${id}-expand`);
         const connectedDevices = document.getElementById(id)
         connectedDevices.classList.toggle('class-enlarge');
         if (connectedDevices.classList.contains('class-enlarge')) {
@@ -215,13 +216,13 @@
           connectedDevices.style.setProperty('z-index', '10');
           connectedDevices.style.setProperty('width', '99%');
           connectedDevices.style.setProperty('height', '97%');
-          connectedDevices.src = "static/minimize.png"        
+          expandElement.src = 'static/minimize.png';
         } else {
           connectedDevices.style.setProperty('position', 'relative');
           connectedDevices.style.setProperty('z-index', '1');
           connectedDevices.style.setProperty('width', 'auto');
           connectedDevices.style.setProperty('height', 'auto');
-          connectedDevices.src = "static/expand.png"        
+          expandElement.src = 'static/expand.png';
         }
       }
     </script>
