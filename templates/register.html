@@ -152,7 +152,7 @@
       <div class="modal-content" style="width: 300px;">
         <!-- <h2>Processing...</h2> -->
         <img src="static\processing.gif" alt="Loading GIF">
-        <!-- <p>Please wait while we process your face. This may take about 15 seconds.</p> -->
+        <p style="font-size: 14px; color: #969292;">Please wait while we process your face. This may take about 15 - 20 seconds.</p>
       </div>
     </div>
 
@@ -211,6 +211,7 @@
         progressBar[1].style.display = "block";
         progressBar[2].style.display = "block";
 
+
         startFaceScan();
       });
 
@@ -247,7 +248,7 @@
 
           const loginBtn = document.getElementById('retry-btn');
           loginBtn.addEventListener('click', function() {
-              window.location.href = "/register";
+              window.location.href = "/setup";
           });
       }
 
