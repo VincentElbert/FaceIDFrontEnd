@@ -25,8 +25,9 @@ app.config['MAIL_SERVER'] = 'smtp.fastmail.com'
 app.config['MAIL_PORT'] = 465
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
-app.config['MAIL_USERNAME'] = 'team1test@fastmail.com'
-app.config['MAIL_PASSWORD'] = '85jj5xcqfy3ypk3q'
+app.config['MAIL_USERNAME'] = 'facedefensemaster@fastmail.com'
+app.config['MAIL_PASSWORD'] = '75q5cyy7nemdus8h'
+# app.config['MAIL_PASSWORD'] = '85jj5xcqfy3ypk3q'
 
 # Secret key for sessions
 app.secret_key = 'test'
@@ -465,7 +466,7 @@ def send_email(email_waitfor_verify, verification_code):
             </body>
             </html>
             """
-            msg = Message('Reset Password', sender='team1test@fastmail.com', recipients=[email_waitfor_verify])
+            msg = Message('Reset Password', sender='facedefensemaster@fastmail.com', recipients=[email_waitfor_verify])
             msg.html = email_string.format(verification_code=verification_code)
             mail.send(msg)
             print("Code for account recovery sent")
@@ -537,7 +538,7 @@ def send_email(email_waitfor_verify, verification_code):
         </body>
         </html>
         """
-        msg = Message('Registration Confirmation', sender='team1test@fastmail.com', recipients=[email_waitfor_verify])
+        msg = Message('Registration Confirmation', sender='facedefensemaster@fastmail.com', recipients=[email_waitfor_verify])
         msg.html = email_string.format(verification_code=verification_code)
         mail.send(msg)
         print("Code for account registration sent")

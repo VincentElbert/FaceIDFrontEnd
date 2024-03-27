@@ -154,7 +154,6 @@
 
         historyTableBody.appendChild(row);
       });
-
     
       logoutMenu.addEventListener('click', function() {
         window.location.href = "{{ url_for('logout') }}";
@@ -164,51 +163,58 @@
       });
       
       toggleSidebarElement.addEventListener('click', function() {
+        toggleSidebar();
+      });
+
+      connectedDevicesExpand.addEventListener('click', function() {
+        expandFunction('connected-devices');
+      });
+      connectedDevicesSidebar.addEventListener('click', function() {
+        expandFunction('connected-devices');
+      });
+
+      connectedAppsExpand.addEventListener('click', function() {
+        expandFunction('connected-apps');
+      });
+      connectedAppsSidebar.addEventListener('click', function() {
+        expandFunction('connected-apps');
+      });
+
+      loginHistoryExpand.addEventListener('click', function() {
+        expandFunction('login-history');
+      });
+      loginHistorySidebar.addEventListener('click', function() {
+        expandFunction('login-history');
+      });
+
+      function toggleSidebar(){
+        var sidebarWidth = getComputedStyle(document.documentElement).getPropertyValue('--sidebar-width');
+        var sidebarPadding = getComputedStyle(document.documentElement).getPropertyValue('--sidebar-padding');
+        var contentPadding = getComputedStyle(document.documentElement).getPropertyValue('--content-padding');
         var sidebar = document.querySelector('.sidebar');
         var cards = document.querySelector('.cards');
         sidebar.classList.toggle('sidebar-hidden');
         if (sidebar.classList.contains('sidebar-hidden')) {
-          sidebar.style.setProperty('--sidebar-width', '0');
-          sidebar.style.setProperty('--sidebar-padding', '0');
-          cards.style.setProperty('left', '0');
-          cards.style.setProperty('width', 'calc(100% - 40px)');
+          sidebar.style.setProperty('width', '0');
+          sidebar.style.setProperty('padding', '0');
+          cards.style.setProperty('left', `0`);
+          cards.style.setProperty('width', `calc(100% - 2 * ${contentPadding})`);
         } else {
-          sidebar.style.setProperty('--sidebar-width', '120px');
-          sidebar.style.setProperty('--sidebar-padding', '30px');
-          cards.style.setProperty('left', '180px');
-          cards.style.setProperty('width', 'calc(100% - 220px)');
+          sidebar.style.setProperty('width', `${sidebarWidth}`);
+          sidebar.style.setProperty('padding', `${sidebarPadding}`);
+          cards.style.setProperty('left', `calc(${sidebarWidth} + 2 * ${sidebarPadding})`);
+          cards.style.setProperty('width', `calc(100% - ${sidebarWidth} - 2 * ${sidebarPadding} - 2 * ${contentPadding})`);
         }
-      });
+      }
 
-      connectedDevicesExpand.addEventListener('click', function() {
-        expandConnectedDevicesFunction();
-      });
-      connectedDevicesSidebar.addEventListener('click', function() {
-        expandConnectedDevicesFunction();
-      });
-
-      connectedAppsExpand.addEventListener('click', function() {
-        expandConnectedAppsFunction();
-      });
-      connectedAppsSidebar.addEventListener('click', function() {
-        expandConnectedAppsFunction();
-      });
-
-      loginHistoryExpand.addEventListener('click', function() {
-        expandLoginHistoryFunction();
-      });
-      loginHistorySidebar.addEventListener('click', function() {
-        expandLoginHistoryFunction();
-      });
-
-      function expandConnectedDevicesFunction(){
-        const connectedDevices = document.getElementById('connected-devices')
+      function expandFunction(id){
+        const connectedDevices = document.getElementById(id)
         connectedDevices.classList.toggle('class-enlarge');
         if (connectedDevices.classList.contains('class-enlarge')) {
           connectedDevices.style.setProperty('position', 'absolute');
           connectedDevices.style.setProperty('z-index', '10');
-          connectedDevices.style.setProperty('width', '85vw');
-          connectedDevices.style.setProperty('height', '85vh');
+          connectedDevices.style.setProperty('width', '99%');
+          connectedDevices.style.setProperty('height', '97%');
           connectedDevices.src = "static/minimize.png"        
         } else {
           connectedDevices.style.setProperty('position', 'relative');
@@ -216,42 +222,6 @@
           connectedDevices.style.setProperty('width', 'auto');
           connectedDevices.style.setProperty('height', 'auto');
           connectedDevices.src = "static/expand.png"        
-        }
-      }
-
-      function expandConnectedAppsFunction(){
-        const connectedApps = document.getElementById('connected-apps')
-        connectedApps.classList.toggle('class-enlarge');
-        if (connectedApps.classList.contains('class-enlarge')) {
-          connectedApps.style.setProperty('position', 'absolute');
-          connectedApps.style.setProperty('z-index', '10');
-          connectedApps.style.setProperty('width', '85vw');
-          connectedApps.style.setProperty('height', '85vh');
-          connectedApps.src = "static/minimize.png"        
-        } else {
-          connectedApps.style.setProperty('position', 'relative');
-          connectedApps.style.setProperty('z-index', '0');
-          connectedApps.style.setProperty('width', 'auto');
-          connectedApps.style.setProperty('height', 'auto');
-          connectedApps.src = "static/expand.png"        
-        }
-      }
-
-      function expandLoginHistoryFunction(){
-        const loginHistory = document.getElementById('connected-devices')
-        loginHistory.classList.toggle('class-enlarge');
-        if (loginHistory.classList.contains('class-enlarge')) {
-          loginHistory.style.setProperty('position', 'absolute');
-          loginHistory.style.setProperty('z-index', '10');
-          loginHistory.style.setProperty('width', '85vw');
-          loginHistory.style.setProperty('height', '85vh');
-          loginHistory.src = "static/minimize.png"        
-        } else {
-          loginHistory.style.setProperty('position', 'relative');
-          loginHistory.style.setProperty('z-index', '0');
-          loginHistory.style.setProperty('width', 'auto');
-          loginHistory.style.setProperty('height', 'auto');
-          loginHistory.src = "static/expand.png"        
         }
       }
     </script>
