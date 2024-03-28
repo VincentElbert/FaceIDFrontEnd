@@ -92,7 +92,7 @@
     <script>
       const connectionsData = JSON.parse('{{ connections|safe }}');
       const historiesData = JSON.parse('{{ histories|safe }}');
-      historiesData.sort((a, b) => new Date(a.time) - new Date(b.time));
+      historiesData.sort((a, b) => new Date(b.time) - new Date(a.time));
       
       const logoutMenu = document.getElementById('logout-menu');
       const logoutNav = document.getElementById('logout-nav');
