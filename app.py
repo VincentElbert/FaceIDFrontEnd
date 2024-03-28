@@ -15,7 +15,7 @@ from train import train
 from models import db, User, Connection, LogEvent
 from concurrent.futures import ThreadPoolExecutor
 import random
-from sqlalchemy import text
+from sqlalchemy import text 
 from sqlalchemy.orm.exc import NoResultFound
 from flask_mail import Mail, Message
 import json
