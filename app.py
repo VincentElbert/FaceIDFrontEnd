@@ -19,6 +19,7 @@ from sqlalchemy import text
 from sqlalchemy.orm.exc import NoResultFound
 from flask_mail import Mail, Message
 import json
+import fileinput
 
 app = Flask(__name__)
 app.config['MAIL_SERVER'] = 'smtp.fastmail.com'
@@ -30,13 +31,10 @@ app.config['MAIL_PASSWORD'] = '75q5cyy7nemdus8h'
 #app.config['MAIL_USERNAME'] = 'team1test@fastmail.com'
 # app.config['MAIL_PASSWORD'] = '85jj5xcqfy3ypk3q'
 
-# Secret key for sessions
 app.secret_key = 'test'
 
-# Assuming we have a single user for demonstration purposes
-# In a real-world scenario, you would use a database
 user_info = {
-    "admin" : generate_password_hash("password123"),  #temp, should not Never store passwords in plain text
+    "admin" : generate_password_hash("password123"),
     "Justin_Sun": generate_password_hash("password123"),
 }
 
@@ -54,7 +52,6 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///project.db"
 
 app.app_context().push()
 db.init_app(app)
-# Create tables if they do not exist already
 db.drop_all()
 db.create_all()
 
@@ -69,7 +66,6 @@ for user in user_info.keys():
 print(db.session.execute(db.select(User).filter_by(email="admin")).scalar_one().connections)
 
 
-# Generate model using encodings
 if not os.path.exists(app.config['ENCODINGS_PATH']):
     encodeSet(UPLOAD_FOLDER, app.config['ENCODINGS_PATH'])
     train(app.config['ENCODINGS_PATH'])
@@ -93,7 +89,7 @@ def home():
     user = db.session.execute(db.select(User).filter_by(email=username)).scalar_one()
     connections = [serialize_connection(connection) for connection in user.connections]
     histories = [serialize_history(event) for event in user.logevent]
-    return render_template('home.html', username=username, connections=json.dumps(connections), histories=json.dumps(histories))
+    return render_template('home.html', username=user.email, connections=json.dumps(connections), histories=json.dumps(histories))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -140,24 +136,10 @@ def faceID():
         user = db.session.execute(db.select(User).filter_by(email=username)).scalar_one()
 
         frames = []
-        # testFileName = "" # Temporary solution, should be changed
         for i in range(len(request.files)):
             frame = request.files['frame_' + str(i)]
-            # filename = secure_filename(frame.filename)
-            
-            ## Generate a unique filename with timestamp
-            # timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-            # filename = f"{timestamp}_{filename}"
-            
-            # filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            # with open(filepath, 'wb') as file:
-            #    file.write(frame.read())
             frames.append(frame)
-
-            # testFileName = filepath # Temporary solution, should be changed
     
-        # For demonstration assumin authentication is successful
-        # result = infer(testFileName)
         result = infer(frames[0].stream)
         if (result != None and result[0] == username):
             print('Face recognized for '+ username)
@@ -175,7 +157,7 @@ def faceID():
             user.logevent.append(new_login)
             db.session.add(new_login)
             db.session.commit()
-            return jsonify({'redirect': url_for('home')})  # Return JSON response with redirect URL
+            return jsonify({'redirect': url_for('home')})
         else:
             new_failed_login = LogEvent(
                 user_email=username,
@@ -191,17 +173,13 @@ def faceID():
             db.session.add(new_failed_login)
             db.session.commit()
             print('Face not recognized')
-            return jsonify({'message': 'Face not recognized. Please Try Again'})  # Return JSON response with message
+            return jsonify({'message': 'Face not recognized. Please Try Again'})
     else:
         return render_template('faceID.html', username=session['username'])
 
 @app.route('/recoveryFaceID', methods=['GET','POST'])
 def recoveryFaceID():
     verification_code = generate_verification_code()
-    # user_info[email] = {
-    # 'password': generate_password_hash(password),
-    # 'verification_code': verification_code,
-    # }
     if request.method == 'POST': 
         frames = []
         for i in range(len(request.files)):
@@ -223,12 +201,92 @@ def recoveryFaceID():
                 'recovery': True
             }
             return jsonify(response)
-            # return redirect(url_for('verification', email=result[0], recovery=True))  # Return JSON response with redirect URL
         else:
             print('Face not recognized')
-            return jsonify({'message': 'Face not recognized. Please Try Again'})  # Return JSON response with message
+            return jsonify({'message': 'Face not recognized. Please Try Again'})
     else:
         return render_template('recoveryFaceID.html')
+    
+@app.route('/changeEmailFaceID', methods=['GET','POST'])
+def changeEmailFaceID():
+    if request.method == 'POST': 
+        frames = []
+        for i in range(len(request.files)):
+            frame = request.files['frame_' + str(i)]
+
+            frames.append(frame)
+        result = infer(frames[0].stream)
+        if (result != None and str(result[0]) != "N" and result[0]):
+            email = str(result[0])
+            print('Result is: --------------------- ' + str(result))
+
+            if (email != session['username']):
+                return jsonify({'message': 'Face not recognized. Please Try Again'})
+
+            print('Face recognized for '+ str(result[0]))
+            response = {
+                'redirect': url_for('changeEmail'),
+                'email': email,
+            }
+            return jsonify(response)
+        else:
+            print('Face not recognized')
+            return jsonify({'message': 'Face not recognized. Please Try Again'})
+    else:
+        return render_template('changeEmailFaceID.html')
+
+@app.route('/changeEmail', methods=['GET','POST'])
+def changeEmail():
+    if request.method == 'POST':
+        oldEmail = session['username']
+        newEmail = request.form.get('email')
+        password = request.form.get('password')
+
+        global user_agent
+        user_agent = parse(request.user_agent.string)
+        verification_code = generate_verification_code()
+        global email_waitfor_verify 
+        email_waitfor_verify = newEmail
+        ip = request.remote_addr
+
+        if db.session.query(User.email).filter_by(email=oldEmail).scalar():
+            user = db.session.execute(db.select(User).filter_by(email=oldEmail)).scalar_one()
+            if check_password_hash(user.password, password):
+                user.email = newEmail
+
+                for connection in user.connections:
+                    connection.user_email = newEmail
+
+                for log_event in user.logevent:
+                    log_event.user_email = newEmail
+
+                with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'resources', 'encodings.txt'), 'r') as file:
+                    lines = file.readlines()
+
+                with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'resources', 'encodings.txt'), 'w') as file:
+                    for line in lines:
+                        current_email, numbers = line.strip().split(':')
+                        if current_email == oldEmail:
+                            line = f'{newEmail}:{numbers}'
+                            file.write(line + '\n')
+                        else:
+                            file.write(line)
+                
+                train(app.config['ENCODINGS_PATH'])
+                user_info[newEmail] = user_info[oldEmail]
+                del user_info[oldEmail]
+                user_info[newEmail]['verification_code'] = verification_code
+                send_email(email_waitfor_verify,verification_code)
+                
+            else:
+                return jsonify({'message': "Wrong Password"})
+
+            db.session.commit()
+            return jsonify({'message': "Email updated successfully"})
+        else:
+            return jsonify({'message': "Error when changing email"})
+    else:
+        return render_template('changeEmail.html')
 
 @app.route('/logout')
 def logout():
@@ -248,7 +306,6 @@ def register():
         global email_waitfor_verify 
         email_waitfor_verify = email
         ip = request.remote_addr
-        # Store the registration data in the user_info dictionary
         user_info[email] = {
             'password': generate_password_hash(password),
             'verification_code': verification_code,
@@ -270,7 +327,7 @@ def register():
                         file.write("\n".join([email + encoding for encoding in encodings]))
                     train(app.config['ENCODINGS_PATH'])
                     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                    user_info[email]['timestamp'] = timestamp  # Add the timestamp to the existing user_info[email] dictionary
+                    user_info[email]['timestamp'] = timestamp  
                     send_email(email_waitfor_verify,verification_code)
                     print("User info after registration:")
                     print(user_info)
@@ -309,24 +366,11 @@ def reset():
 def setup():
     return render_template('setup.html')
 
-@app.route('/process_scans', methods=['POST'])
-def process_scans():
-    scans = request.json
-    # Process the scan data
-    for step, image_data in scans.items():
-        # TODO: Process each image_data, for example, save to a file or a database
-        print(f"Received scan for {step}")
-
-    
-    #  might want to implement actual success checking logic based on processing
-    return jsonify({'success': True})
-
 @app.route('/verification', methods=['GET', 'POST'])
 def verification():
     if request.method == 'POST':
         data = request.get_json()
         email = email_waitfor_verify
-        #email = data.get('email')
         verification_code = data.get('verification_code')
         recovery = data.get('recovery')
         print("The email wait for verify:-----------------------------------  " + email)
@@ -335,17 +379,13 @@ def verification():
             if user_info[email]['verification_code'] == verification_code and recovery != 'true':
                 current_timestamp = datetime.now()
                 
-                # Get the registration timestamp from user_info
                 registration_timestamp_str = user_info[email]['timestamp']
                 registration_timestamp = datetime.strptime(registration_timestamp_str, "%Y-%m-%d %H:%M:%S")
                 
-                # Calculate the timestamp 5 minutes ago
                 five_minutes_ago = current_timestamp - timedelta(seconds=60)
 
                 if registration_timestamp > five_minutes_ago:
                         
-                        # Verification code is correct
-                        # Mark the email as verified in the user_info dictionary or your database
                         user_info[email]['verified'] = True
                         new_user = User(
                             email=email,
@@ -377,20 +417,21 @@ def verification():
                         db.session.add(new_user_connection)
                         db.session.add(new_creation)
                         db.session.commit()
-
                         return {'success': 'true', 'recovery': 'false'}
-                    
+                
                 else:
-
                     return {'success': False, 'message': 'Verification code has expired. Please request a new one.'}
-
+            
             elif user_info[email]['verification_code'] == verification_code and recovery == 'true':
                 return {'success': 'true', 'recovery': 'true'}
+            
             else:
                 return {'success': 'false', 'message': 'Invalid verification code. Please try again.'}
+        
         else:
             # Invalid email
             return {'success': 'false', 'message': 'Email is missing'}
+    
     else:
         email = request.args.get('email')
         recovery = request.args.get('recovery')
@@ -530,7 +571,7 @@ def send_email(email_waitfor_verify, verification_code):
         </head>
         <body>
             <div class="container">
-                <h1>Welcome to Face Denfense Master!</h1>
+                <h1>Welcome to Face Defense Master!</h1>
                 <p class="simpletext">Please enter the following code to proceed to activate your account:</p>
                 <div class="code">{verification_code}</div>
                 <p class="expiration">The code will expire in 5 minutes.</p>
@@ -551,13 +592,24 @@ def resend_verification():
         verification_code = generate_verification_code()
         user_info[email_waitfor_verify]['verification_code'] = verification_code
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        user_info[email_waitfor_verify]['timestamp'] = timestamp  # Add the timestamp to the existing user_info[email] dictionary
+        user_info[email_waitfor_verify]['timestamp'] = timestamp  
         print(user_info)
         send_email(email_waitfor_verify,verification_code)
         return render_template('verification.html')
     else:
         return render_template('verification.html')
     
+@app.route('/profile', methods=['GET','POST'])
+def profile():
+    if 'username' not in session or not session.get('authenticated', False) or not db.session.query(User.email).filter_by(email=session['username']).scalar():
+        return redirect(url_for('login'))
+    username=session['username']
+
+    if request.method == 'POST':
+
+        return render_template('profile.html')
+    return render_template('profile.html', username=username)
+
 def serialize_connection(connection):
     return {
         'cid': str(connection.cid),
@@ -574,9 +626,5 @@ def serialize_history(event):
         'event_desc': event.event_desc
     }
 
-
-# ... other route definitions ...
-
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=app.config['SERVER_PORT'], ssl_context='adhoc')
-

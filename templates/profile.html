@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profile</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='page.css') }}"
+    />
+  </head>
+  <body>
+    <div class="sidebar">
+      <div class="side-items-container">
+        <div id="account-sidebar" class="side-item">Account</div>
+        <div id="login-history-sidebar" class="side-item">Log-in History</div>
+        <div id="connected-devices-sidebar" class="side-item">
+          Connected Devices
+        </div>
+        <div id="connected-apps-sidebar" class="side-item">Connected Apps</div>
+      </div>
+      <div class="side-items-container">
+        <div class="side-item">Settings</div>
+        <div id="logout-menu" class="side-item">Logout</div>
+      </div>
+    </div>
+    <div class="navbar">
+      <div class="nav-items">
+        <img
+          src="static/menu-icon.png"
+          alt="Menu Icon"
+          class="icon"
+          id="toggle-sidebar"
+        />
+        <img
+          src="static/face_defense_master_logo.png"
+          alt="Web Logo"
+          class="logo"
+          id="fdm-logo"
+        />
+      </div>
+      <div class="nav-items">
+        <p id="account-nav-text" >{{username}}</p>
+        <img id="account-nav-img" src="static/profile-icon.png" alt="Profile Icon" class="icon" />
+        <img
+          id="logout-nav"
+          src="static/logout-icon.png"
+          alt="Logout Icon"
+          class="icon"
+        />
+      </div>
+    </div>
+
+    <div class="content">
+        <div class="cards">
+            <div id="profile-card" class="card">
+                <img id="profile-picture" src="static/profile-icon.png" alt="Profile Picture">
+                <h1>{{username}}</h1>
+                <div class="bar">
+                    <h3>{{username}}</h3>
+                    <div id="change-email" class="button primary-button">Change Email</div>
+                </div>
+                <div class="bar">
+                    <h3>********</h3>
+                    <div id="change-password" class="button primary-button">Change Password</div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+    <script>
+      const accountNavImg = document.getElementById('account-nav-img');
+      const accountNavText = document.getElementById('account-nav-text');
+      const logoutMenu = document.getElementById('logout-menu');
+      const logoutNav = document.getElementById('logout-nav');
+      const toggleSidebarElement = document.getElementById('toggle-sidebar');
+      const fdmLogo = document.getElementById('fdm-logo');
+      
+      const accountSidebar = document.getElementById('account-sidebar');
+      const connectedDevicesSidebar =document.getElementById('connected-devices-sidebar');
+      const connectedAppsSidebar =document.getElementById('connected-apps-sidebar');
+      const loginHistorySidebar =document.getElementById('login-history-sidebar');
+      
+      const changeEmail = document.getElementById('change-email');
+      const changePassword = document.getElementById('change-password');
+    
+      logoutMenu.addEventListener('click', function() {
+        window.location.href = "{{ url_for('logout') }}";
+      });
+      logoutNav.addEventListener('click', function() {
+        window.location.href = "{{ url_for('logout') }}";
+      });
+      
+      fdmLogo.addEventListener('click', function() {
+        window.location.href = "{{ url_for ('home') }}"
+      });
+
+      toggleSidebarElement.addEventListener('click', function() {
+        toggleSidebar();
+      });
+
+      accountNavImg.addEventListener('click', function(){
+        window.location.href = "{{ url_for('profile') }}";
+      });
+      accountNavText.addEventListener('click', function(){
+        window.location.href = "{{ url_for('profile') }}";
+      });
+      accountSidebar.addEventListener('click', function(){
+        window.location.href = "{{ url_for('profile') }}";
+      });
+      
+      fdmLogo.addEventListener('click', function() {
+        window.location.href = "{{ url_for ('home') }}";
+      });
+      
+      connectedDevicesSidebar.addEventListener('click', function() {
+        window.location.href = "{{ url_for('home') }}"
+      });
+
+      connectedAppsSidebar.addEventListener('click', function() {
+        window.location.href = "{{ url_for('home') }}"
+      });
+
+      loginHistorySidebar.addEventListener('click', function() {
+        window.location.href = "{{ url_for('home') }}"
+      });
+
+      changeEmail.addEventListener('click', function(){
+        window.location.href = "{{ url_for('changeEmailFaceID') }}"
+      })
+      changePassword.addEventListener('click', function() {
+        window.location.href = "{{ url_for('recoveryFaceID') }}"
+      })
+
+      function toggleSidebar(){
+        var sidebarWidth = getComputedStyle(document.documentElement).getPropertyValue('--sidebar-width');
+        var sidebarPadding = getComputedStyle(document.documentElement).getPropertyValue('--sidebar-padding');
+        var contentPadding = getComputedStyle(document.documentElement).getPropertyValue('--content-padding');
+        var sidebar = document.querySelector('.sidebar');
+        var cards = document.querySelector('.cards');
+        sidebar.classList.toggle('sidebar-hidden');
+        if (sidebar.classList.contains('sidebar-hidden')) {
+          sidebar.style.setProperty('width', '0');
+          sidebar.style.setProperty('padding', '0');
+          cards.style.setProperty('left', `0`);
+          cards.style.setProperty('width', `calc(100% - 2 * ${contentPadding})`);
+        } else {
+          sidebar.style.setProperty('width', `${sidebarWidth}`);
+          sidebar.style.setProperty('padding', `${sidebarPadding}`);
+          cards.style.setProperty('left', `calc(${sidebarWidth} + 2 * ${sidebarPadding})`);
+          cards.style.setProperty('width', `calc(100% - ${sidebarWidth} - 2 * ${sidebarPadding} - 2 * ${contentPadding})`);
+        }
+      }
+    </script>
+</body>
+</html>

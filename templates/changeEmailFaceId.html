@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Face Scanning</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/webcamjs/1.0.26/webcam.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  </head>
+  <body>
+    <img id="logo" src="static/face_defense_master_logo.png" alt="logo"/>
+    <div class="container">
+      <div id="face-scan-instructions">
+        <p>Hello <b>{{username}}</b>,<br> Scan your face to verify your identity.</p>
+      </div>
+      <div id="webcam-container">
+        <div id="webcam"></div>
+      </div>
+    </div>
+    <div id="scan-hint" class="hint">
+      <img src="static/brightness.png" alt="Brightness" class="icon" />
+      Please ensure to have good lighting and a clear background.
+    </div>
+    <div>
+      <button id="back-btn" class="button primary-button">Back</button>
+      <button id="scan-btn" class="button primary-button">Scan</button>
+    </div>
+
+    <script>
+      const faceScanInstructions = document.getElementById("face-scan-instructions");
+      Webcam.set({
+        width: 400,
+        height: 300,
+        image_format: 'jpeg',
+        jpeg_quality: 90,
+        flip_horiz: true // Flip camera horizontally
+      });
+      Webcam.attach('#webcam');
+
+      $('#scan-btn').click(function () {
+        faceScanInstructions.textContent = 'Authenticating...';
+        var frames = [];
+        var captureFrame = function () {
+          Webcam.snap(function (data_uri) {
+            var img = new Image();
+            img.onload = function () {
+              var canvas = document.createElement('canvas');
+              canvas.width = 200; // Width of the center region to extract
+              canvas.height = img.height;
+
+              var ctx = canvas.getContext('2d');
+              ctx.drawImage(img, (img.width - canvas.width) / 2, 0, canvas.width, canvas.height, 0, 0, canvas.width, canvas.height);
+
+              canvas.toBlob(function (blob) {
+                frames.push(blob);
+                if (frames.length < 30) {
+                  setTimeout(captureFrame, 0);
+                } else {
+                  sendFrames(frames);
+                }
+              }, 'image/jpeg', 1.0);
+            };
+            img.src = data_uri;
+          });
+        };
+        captureFrame();
+      });
+      
+      $('#back-btn').click(function () {
+        // Add logic to go back to the previous page or desired location
+        window.history.back();
+      });
+      
+      function sendFrames(frames) {
+        var formData = new FormData();
+        frames.forEach(function (frame, index) {
+          formData.append('frame_' + index, frame, 'frame_' + index + '.jpeg');
+        });
+      
+        $.ajax({
+          url: '/changeEmailFaceID',
+          type: 'POST',
+          data: formData,
+          processData: false,
+          contentType: false,
+          success: function (response) {
+            if (response.redirect) {
+              
+              window.location.href = response.redirect;
+            } else {
+              showMessage(response.message);
+            }
+          },
+          error: function (xhr, status, error) {
+            console.error(error);
+            showMessage('Error sending to server. Please try again.');
+          },
+          complete: function () {
+            // Reattach the webcam after sending frames to ensure it's available for the next time
+            Webcam.attach('#webcam');
+          }
+        });
+      }
+      
+      function showMessage(message) {
+        // Display the message as desired
+        console.log(message);
+        faceScanInstructions.textContent = message;
+      }
+    </script>
+  </body>
+</html>

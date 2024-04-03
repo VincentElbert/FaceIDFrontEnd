@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body>
+    <img id="main-logo" src="static/face_defense_master_logo.png" alt="logo" />
+    <div class="container">
+      <form id="change-email-form">
+        <h2>Change Email</h2>
+        <label for="email">New Email:</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          placeholder="Email"
+          required
+        />
+
+        <div class="error-message" id="email-error"></div>
+        <label for="password">Password:</label>
+        <div style="position: relative">
+          <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Password"
+            required
+          />
+          <span
+            id="toggle-password"
+            class="password-toggle-icon"
+            onclick="togglePasswordVisibility('password')"
+          >
+            <img src="static/eye_icon.png" alt="Show Password" class="icon" />
+          </span>
+        </div>
+        <div class="error-message" id="password-error"></div>
+        <input type="submit" value="Next" />
+      </form>
+      
+      <div id="register-success-modal" class="modal">
+        <div class="modal-content">
+            <h2>Change Email Successful!</h2>
+            <p>A verification code has sent to the new email:</p>
+            <p id="user-email" style="font-weight: bold;"></p>
+            <button id="login-btn">Continue</button>
+        </div>
+      </div>
+      <div id="register-fail-modal" class="Fail-modal">
+        <div class="Fail-modal-content">
+          <h2>Change Email Fail!</h2>
+          <button id="retry-btn">Retry</button>
+        </div>
+    </div>
+    <script>
+      const changeEmailForm = document.getElementById("change-email-form");
+      const emailInput = document.getElementById("email");
+      const passwordInput = document.getElementById("password");
+
+      changeEmailForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+        sendRequest();
+      });
+
+      async function sendRequest() {
+        const formData = new FormData();
+        formData.append("email", emailInput.value);
+        formData.append("password", passwordInput.value);
+        const response = await fetch("/changeEmail", {
+          method: "POST",
+          body: formData,
+        });
+
+        const data = await response.json();
+
+        if (data.message === "Email updated successfully") {
+          showSuccessModal();
+        } else {
+          setTimeout(() => {
+            showFailModal();
+          }, 4000);
+        }
+      }
+
+      function isValidEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+      }
+      function togglePasswordVisibility() {
+        var passwordInput = document.getElementById("password");
+        var toggleIcon = document.getElementById("toggle-password");
+
+        if (passwordInput.type === "password") {
+          passwordInput.type = "text";
+          toggleIcon.innerHTML =
+            '<img src="static/eye_icon_hide.png" alt="Hide Password" class="icon">';
+        } else {
+          passwordInput.type = "password";
+          toggleIcon.innerHTML =
+            '<img src="static/eye_icon.png" alt="Show Password" class="icon">';
+        }
+      }
+
+      function showSuccessModal() {
+        const firstFiveLetters = emailInput.value.substring(0, 3);
+        const lastEightLetters = emailInput.value.substring(8, 0);
+
+        const maskedEmail =
+          firstFiveLetters +
+          "*".repeat(emailInput.value.length - 3 - 8) +
+          lastEightLetters;
+        document.getElementById("user-email").textContent = emailInput.value;
+        const modal = document.getElementById("register-success-modal");
+        modal.style.display = "block";
+
+        const loginBtn = document.getElementById("login-btn");
+        loginBtn.addEventListener("click", function () {
+          window.location.href = "/verification";
+        });
+      }
+
+      function showFailModal() {
+        const modal = document.getElementById("register-fail-modal");
+        modal.style.display = "block";
+
+        const loginBtn = document.getElementById("retry-btn");
+        loginBtn.addEventListener("click", function () {
+          window.location.href = "/changeEmail";
+        });
+      }
+    </script>
+  </body>
+</html>
