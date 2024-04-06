@@ -2,6 +2,9 @@
 FROM python:3.12 AS dependency
 WORKDIR /app
 
+# Install CMake
+RUN apt-get update && apt-get install -y cmake
+
 # Install dlib and face_recognition as a separate step for caching
 RUN pip install --user dlib
 RUN pip install --user face_recognition
