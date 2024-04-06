@@ -3,7 +3,6 @@ from datetime import datetime, timedelta
 
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
-from werkzeug.utils import secure_filename
 import os
 import ipinfo
 from user_agents import parse
@@ -13,13 +12,11 @@ from inference import infer, loginInfer
 from face_to_encoding import encodeSet, encodeByPerson, checkValidCamInput
 from train import train
 from models import db, User, Connection, LogEvent
-from concurrent.futures import ThreadPoolExecutor
 import random
-from sqlalchemy import text 
 from sqlalchemy.orm.exc import NoResultFound
 from flask_mail import Mail, Message
 import json
-import fileinput
+import logging
 
 app = Flask(__name__)
 app.config['MAIL_SERVER'] = 'smtp.fastmail.com'
@@ -310,11 +307,14 @@ def register():
         
         if email and password and request.files:
             try:
+                logging.info('Image processing started')
                 encodings = []
                 for index in range(len(request.files)):
+                    logging.info(f'faceImages_{index}')
                     if f'faceImages_{index}' in request.files:
                         person_img = request.files[f'faceImages_{index}']
                         encodingLine = encodeByPerson(person_img)
+                        logging.info(encodingLine)
                         if encodingLine:
                             encodings.append(encodingLine)
 
@@ -332,10 +332,10 @@ def register():
 
                     return jsonify({'message': 'Registration successful!'})
                 else:
-                    return jsonify({'message': 'Registration failed. Encodings are empty!' + '\n'.join(encodings)})
+                    return jsonify({'message': 'Registration failed. Encodings are empty!'})
             except Exception as e:
                 print(f"Error during registration: {str(e)}")
-                return jsonify({'message': 'Registration failed. Cannot encode face!' + '\n'.join(encodings)})
+                return jsonify({'message': 'Registration failed. Cannot encode face!'})
         else:
             return jsonify({'message': 'Registration failed. Email, password, or image is missing!'})
     return render_template('register.html')
