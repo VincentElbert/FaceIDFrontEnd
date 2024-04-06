@@ -143,7 +143,7 @@
           <li>Position your face directly in front of the camera and align it in the centre of the frame.</li>
           <li>Have good lighting and a clear background.</li>
         </ul>
-        <p id="register-fail-message"></p>
+        <div id="register-fail-message"></div>
         <img src="static\Animation--Fail.gif" alt="Fail Demo GIF">
         <button id="retry-btn">Retry</button>
       </div>
@@ -247,7 +247,7 @@
           const modal = document.getElementById('register-fail-modal');
           modal.style.display = 'block';
 
-          const registerFailMessage = document.getElementById('registrater-fail-message')
+          const registerFailMessage = document.getElementById('registrater-fail-message');
           registerFailMessage.textContent = message;
           
           const loginBtn = document.getElementById('retry-btn');
