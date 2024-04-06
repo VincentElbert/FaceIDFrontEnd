@@ -332,12 +332,12 @@ def register():
 
                     return jsonify({'message': 'Registration successful!'})
                 else:
-                    return jsonify({'message': 'Registration failed.'})
+                    return jsonify({'message': 'Registration failed. Encodings are empty!'})
             except Exception as e:
                 print(f"Error during registration: {str(e)}")
-                return jsonify({'message': 'Registration failed.'})
+                return jsonify({'message': 'Registration failed. Cannot encode face!'})
         else:
-            return jsonify({'message': 'Registration failed.'})
+            return jsonify({'message': 'Registration failed. Email, password, or image is missing!'})
     return render_template('register.html')
 
 

@@ -242,10 +242,11 @@
             });
         }
 
-      function showFailModal() {
+      function showFailModal(message) {
           const modal = document.getElementById('register-fail-modal');
           modal.style.display = 'block';
 
+          console.log(message)
           const loginBtn = document.getElementById('retry-btn');
           loginBtn.addEventListener('click', function() {
               window.location.href = "/setup";
@@ -347,7 +348,7 @@
         } else {
           setTimeout(() => {
             processingPopup.style.display = "none";
-            showFailModal();
+            showFailModal(data.message);
           }, 4000);
         } 
       }
