@@ -13,15 +13,18 @@
   padding: 0;
 }
 
+html {
+  font-size: 0.7rem;
+}
+
 body {
   font-family: "Poppins", sans-serif;
-  font-size: 12px;
   background: linear-gradient(0deg, #85b5D9, #CFE7F8);
 }
 
 #logo {
   width: 20vw;
-  min-width: 220px;
+  max-width: 50px;
   height: auto;
   margin-bottom: 0.5rem;
 }
@@ -36,7 +39,7 @@ body {
 .button {
   margin: 0.5em;
   padding: 10px;
-  font-size: 12px;
+  font-size: 0.9rem;
   border: none;
   cursor: pointer;
   border-radius: 5px;
@@ -73,6 +76,7 @@ body {
   justify-content: space-between;
   background: linear-gradient(0deg, #BAD9EF, #85b5D9);
   box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.1);
+  z-index: 100;
 }
 
 .navbar .nav-items {
@@ -97,7 +101,7 @@ body {
 }
 
 .nav-items *:hover {
-  font-size: larger;
+  font-size: 0.9rem;
 }
 
 .sidebar {
@@ -128,7 +132,7 @@ body {
   margin-bottom: 10px;
   display: flex;
   flex-direction: column;
-  gap: 30px;
+  gap: 5vh;
 }
 
 .side-item {
@@ -139,7 +143,7 @@ body {
 }
 
 .side-item:hover {
-  font-size: 13px;
+  font-size: 0.9rem;
   background-color: #f0f0f0;
 }
 
@@ -179,11 +183,11 @@ body {
 
 .card {
   grid-column: span 1;
-  min-width: 240px;
+  min-width: 200px;
   min-height: 240px;
   position: relative;
   background-color: #E7F4FC;
-  padding: 10px;
+  padding: 5px;
   border-radius: 20px;
   overflow: hidden;
   transition: width 0.3s ease-in-out;
@@ -220,7 +224,7 @@ body {
   width: fit-content;
   background-color: white;
   border-radius: 10px;
-  font-size: 16px;
+  font-size: 0.9rem;
 }
 
 .card p {

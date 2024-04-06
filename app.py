@@ -63,9 +63,6 @@ for user in user_info.keys():
     db.session.add(test_user)
     db.session.commit()
 
-print(db.session.execute(db.select(User).filter_by(email="admin")).scalar_one().connections)
-
-
 if not os.path.exists(app.config['ENCODINGS_PATH']):
     encodeSet(UPLOAD_FOLDER, app.config['ENCODINGS_PATH'])
     train(app.config['ENCODINGS_PATH'])

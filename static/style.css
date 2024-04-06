@@ -2,6 +2,10 @@
 
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap");
 
+html {
+  font-size: 0.8rem;
+}
+
 body {
   margin: 0;
   display: flex;
@@ -17,7 +21,8 @@ body {
 }
 
 #main-logo {
-    width: 450px !important;
+  width: 70vw;
+  max-width: 500px;
 }
 
 #logo {
@@ -27,7 +32,8 @@ body {
 }
 
 .container {
-  width: 450px;
+  width: 65vw;
+  max-width: 450px;
   padding: 10px;
   background: rgba(255, 255, 255, 0.9);
   border-radius: 10px;
@@ -43,7 +49,7 @@ body {
 .button {
   margin: 0.5em;
   padding: 10px 20px;
-  font-size: 16px;
+  font-size: 1rem;
   border: none;
   cursor: pointer;
   border-radius: 5px;
@@ -72,6 +78,7 @@ label {
 }
 
 h2 {
+  font-size: 1.2rem;
   margin-bottom: 1em;
   color: #ff6b6b;
   transition: color 0.3s ease-in-out;
@@ -81,14 +88,22 @@ h2:hover {
   color: #4ecdc4;
 }
 
+label {
+  font-size: 0.8rem;
+}
+
 p {
-  font-size: 14px;
+  font-size: 0.8rem;
 }
 
 ol {
   margin: 0px;
-  font-size: 14px;
+  font-size: 0.8rem;
   text-align: left;
+}
+
+input {
+  font-size: 0.8rem;
 }
 
 input[type="text"],
@@ -124,7 +139,6 @@ input[type="submit"] {
   border-radius: 5px;
   background-color: #ff6b6b;
   color: white;
-  font-size: 1em;
   cursor: pointer;
   transition: background-color 0.3s ease-in-out, transform 0.3s ease-in-out;
 }
@@ -135,7 +149,7 @@ input[type="submit"]:hover {
 }
 
 .hint {
-  font-size: 12px;
+  font-size: 0.8rem;
   color: #888;
   text-align: left;
   margin-top: 10px;
@@ -145,7 +159,8 @@ input[type="submit"]:hover {
   align-items: center;
   justify-content: center;
   border-radius: 5px;
-  width: 480px;
+  width: 65vw;
+  max-width: 450px;
 }
 
 .icon {
@@ -260,7 +275,7 @@ input[type="password"] {
 #face-scan-instructions {
   margin-bottom: 5px;
   padding: 0;
-  font-size: 14px !important;
+  font-size: 0.8rem;
   color: #666;
   display: flex;
   justify-content: center;
@@ -272,7 +287,8 @@ input[type="password"] {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 300px;
+  width: 65vw;
+  max-width: 300px;
   transform: translate(-50%, -50%);
   background-color: #fff;
   border: 1px solid #ccc;
@@ -288,19 +304,20 @@ input[type="password"] {
 }
 
 .popup-title {
-  font-size: 16px;
+  font-size: 1rem;
   margin-bottom: 5px;
 }
 
 .popup-message {
-  font-size: 14px;
+  font-size: 0.8rem;
 }
 
 .progress-bar {
   display: flex;
   justify-content: space-between;
   margin-top: 10px;
-  width: 470px; /* Adjust the width as needed */
+  width: 65vw;
+  max-width: 450px;
 }
 
 .progress-step {
@@ -326,7 +343,7 @@ input[type="password"] {
   left: 50%;
   transform: translate(-50%, -50%);
   color: #fff;
-  font-size: 14px;
+  font-size: 0.8rem;
   font-weight: bold;
 }
 
@@ -347,7 +364,8 @@ input[type="password"] {
   margin: 15% auto;
   padding: 30px;
   border: 1px solid #888;
-  width: 600px;
+  width: 65vw;
+  max-width: 450px;
   text-align: center;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -366,12 +384,12 @@ input[type="password"] {
 }
 
 .modal-content h2 {
-  font-size: 24px;
+  font-size: 1.2rem;
   margin-bottom: 20px;
 }
 
 .modal-content p {
-  font-size: 18px;
+  font-size: 0.8rem;
   margin-bottom: 10px;
 }
 
@@ -382,11 +400,11 @@ input[type="password"] {
 }
 
 #countdown {
-  font-size: 36px;
+  font-size: 1.2rem;
   font-weight: bold;
   color: #ff6600;
   margin-top: 20px;
-  margin-bottom: 30px;
+  margin-bottom: 10px;
 }
 
 #login-btn {
@@ -396,7 +414,7 @@ input[type="password"] {
   color: white;
   border: none;
   cursor: pointer;
-  font-size: 18px;
+  font-size: 1rem;
   border-radius: 5px;
 }
 
@@ -407,7 +425,7 @@ input[type="password"] {
   color: white;
   border: none;
   cursor: pointer;
-  font-size: 18px;
+  font-size: 1rem;
   border-radius: 5px;
 }
 
@@ -448,7 +466,8 @@ input[type="password"] {
   margin: 15% auto;
   padding: 30px;
   border: 1px solid #888;
-  width: 600px;
+  width: 65vw;
+  max-width: 450px;
   text-align: center;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -462,12 +481,12 @@ input[type="password"] {
 }
 
 .Fail-modal-content p {
-  font-size: 18px;
+  font-size: 0.8rem;
   margin-bottom: 10px;
 }
 
 .Fail-modal-content h2 {
-  font-size: 24px;
+  font-size: 1.2rem;
   margin-bottom: 20px;
 }
 

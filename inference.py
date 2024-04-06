@@ -16,10 +16,11 @@ def infer(img_buffer):
         with open('face_classifier.pkl', 'rb') as fid:
             clf = pickle.load(fid)
             p = clf.predict_proba(face_enc.reshape(1, -1))
-            print(p)
-            label_i = np.argmax(p, axis=1)
-            if p[0][label_i] >= 0.9:
-                return clf.predict(face_enc.reshape(1, -1))
+            max_prob_index = np.argmax(p, axis=1)
+            max_prob = p[0][max_prob_index]
+
+            if max_prob >= 0.9:
+                return clf.classes_[max_prob_index]
             else:
                 return "No Match"
 
