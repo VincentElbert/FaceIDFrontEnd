@@ -34,7 +34,8 @@ user_info = {
     "admin" : generate_password_hash("password123"),
     "Justin_Sun": generate_password_hash("password123"),
 }
-
+# Configure logging
+logging.basicConfig(filename='app.log', level=logging.DEBUG, format='%(asctime)s %(levelname)s: %(message)s')
 
 mail = Mail(app)
 ipinfo_token = "3fcc779048091b"
