@@ -13,10 +13,8 @@ from face_to_encoding import encodeSet, encodeByPerson, checkValidCamInput
 from train import train
 from models import db, User, Connection, LogEvent
 import random
-from sqlalchemy.orm.exc import NoResultFound
 from flask_mail import Mail, Message
 import json
-import logging
 
 app = Flask(__name__)
 app.config['MAIL_SERVER'] = 'smtp.fastmail.com'
@@ -34,8 +32,7 @@ user_info = {
     "admin" : generate_password_hash("password123"),
     "Justin_Sun": generate_password_hash("password123"),
 }
-# Configure logging
-logging.basicConfig(filename='app.log', level=logging.INFO, format='%(asctime)s %(levelname)s: %(message)s')
+
 
 mail = Mail(app)
 ipinfo_token = "3fcc779048091b"
@@ -308,14 +305,11 @@ def register():
         
         if email and password and request.files:
             try:
-                logging.info('Image processing started')
                 encodings = []
                 for index in range(len(request.files)):
-                    logging.info(f'faceImages_{index}')
                     if f'faceImages_{index}' in request.files:
                         person_img = request.files[f'faceImages_{index}']
                         encodingLine = encodeByPerson(person_img)
-                        logging.info(encodingLine)
                         if encodingLine:
                             encodings.append(encodingLine)
 
