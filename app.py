@@ -15,6 +15,7 @@ from models import db, User, Connection, LogEvent
 import random
 from flask_mail import Mail, Message
 import json
+import pytz
 
 app = Flask(__name__)
 app.config['MAIL_SERVER'] = 'smtp.fastmail.com'
@@ -37,6 +38,7 @@ user_info = {
 mail = Mail(app)
 ipinfo_token = "3fcc779048091b"
 ip_handler = ipinfo.getHandler(ipinfo_token)
+hongkong_timezone = pytz.timezone('Asia/Hong_Kong')
 
 UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'resources', 'image')
 ENCODINGS_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'resources', 'encodings.txt')
@@ -99,7 +101,7 @@ def login():
                 user = db.session.execute(db.select(User).filter_by(email=username)).scalar_one()
                 new_failed_login = LogEvent(
                     user_email=username,
-                    time=datetime.now(),
+                    time=datetime.now().astimezone(hongkong_timezone),
                     event_desc="Login Failed - Incorrect Password",
                     ip=request.remote_addr,
                     location=ip_handler.getDetails(request.remote_addr).country_name
@@ -136,15 +138,31 @@ def faceID():
         if (result != None and result[0] == username):
             print('Face recognized for '+ username)
             session['authenticated'] = True
+            
+            # Check if the device is already in user's connections
+            device_name = ": ".join(str(user_agent).split(' / ')[:1])
+            connection = db.session.execute(
+                db.select(Connection).filter_by(user_email=username, device=device_name)
+            ).scalar_one_or_none()
+
+            if connection is None:
+                # Create a new connection
+                new_connection = Connection(
+                    user_email=username,
+                    device=device_name
+                )
+                db.session.add(new_connection)
+                db.session.commit()
+
             new_login = LogEvent(
                 user_email=username,
-                time=datetime.now(),
+                time=datetime.now().astimezone(hongkong_timezone),
                 event_desc="Login Success",
                 ip=request.remote_addr,
                 location=ip_handler.getDetails(request.remote_addr).country_name
                 if hasattr(ip_handler.getDetails(request.remote_addr), "country_name")
                 else "Location Undetectable",
-                device=": ".join(str(user_agent).split(' / ')[:1]),
+                device=device_name,
             )
             user.logevent.append(new_login)
             db.session.add(new_login)
@@ -153,7 +171,7 @@ def faceID():
         else:
             new_failed_login = LogEvent(
                 user_email=username,
-                time=datetime.now(),
+                time=datetime.now().astimezone(hongkong_timezone),
                 event_desc="Login Failed - Failed Face Recognition",
                 ip=request.remote_addr,
                 location=ip_handler.getDetails(request.remote_addr).country_name
@@ -388,7 +406,7 @@ def verification():
                         )
                         new_creation = LogEvent(
                             user_email=email,
-                            time=datetime.now(),
+                            time=datetime.now().astimezone(hongkong_timezone),
                             event_desc="Create Account",
                             ip=request.remote_addr,
                             location=ip_handler.getDetails(request.remote_addr).country_name
@@ -415,6 +433,21 @@ def verification():
                     return {'success': False, 'message': 'Verification code has expired. Please request a new one.'}
             
             elif user_info[email]['verification_code'] == verification_code and recovery == 'true':
+                user = db.session.query(User).filter(User.email == email).first()
+
+                password_change = LogEvent(
+                    user_email=email,
+                    time=datetime.now().astimezone(hongkong_timezone),
+                    event_desc="Password changed",
+                    ip=request.remote_addr,
+                    location=ip_handler.getDetails(request.remote_addr).country_name
+                    if hasattr(ip_handler.getDetails(request.remote_addr), "country_name")
+                    else "Location Undetectable",
+                    device=": ".join(str(user_agent).split(' / ')[:1]),
+                )
+                user.logevent.append(password_change)
+                db.session.add(password_change)
+                db.session.commit()
                 return {'success': 'true', 'recovery': 'true'}
             
             else:

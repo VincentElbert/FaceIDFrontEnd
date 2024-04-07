@@ -10,7 +10,7 @@
     />
   </head>
   <body>
-    <div class="sidebar">
+    <div class="sidebar sidebar-hidden">
       <div class="side-items-container">
         <div id="account-sidebar" class="side-item">Account</div>
         <div id="login-history-sidebar" class="side-item">Log-in History</div>
@@ -137,18 +137,13 @@
         var sidebarPadding = getComputedStyle(document.documentElement).getPropertyValue('--sidebar-padding');
         var contentPadding = getComputedStyle(document.documentElement).getPropertyValue('--content-padding');
         var sidebar = document.querySelector('.sidebar');
-        var cards = document.querySelector('.cards');
         sidebar.classList.toggle('sidebar-hidden');
         if (sidebar.classList.contains('sidebar-hidden')) {
           sidebar.style.setProperty('width', '0');
           sidebar.style.setProperty('padding', '0');
-          cards.style.setProperty('left', `0`);
-          cards.style.setProperty('width', `calc(100% - 2 * ${contentPadding})`);
         } else {
           sidebar.style.setProperty('width', `${sidebarWidth}`);
           sidebar.style.setProperty('padding', `${sidebarPadding}`);
-          cards.style.setProperty('left', `calc(${sidebarWidth} + 2 * ${sidebarPadding})`);
-          cards.style.setProperty('width', `calc(100% - ${sidebarWidth} - 2 * ${sidebarPadding} - 2 * ${contentPadding})`);
         }
       }
     </script>

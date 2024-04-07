@@ -110,15 +110,16 @@ body {
   overflow: hidden;
   top: calc(var(--navbar-height) + 2 * var(--navbar-padding));
   left: 0;
-  width: var(--sidebar-width);
+  width: 0;
   height: calc(100% - (var(--navbar-height) + 2 * var(--navbar-padding) + 2 * var(--sidebar-padding)));
-  padding: var(--sidebar-padding);
+  padding: 0;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   background: linear-gradient(0deg, #397BAD, #CFE7F8);
   box-shadow: 10px 4px 10px rgba(0, 0, 0, 0.1);
   transition: width 0.4s ease-in-out;
+  z-index: 99;
 }
 
 .sidebar-hidden {
@@ -167,8 +168,8 @@ body {
 .cards {
   position: relative;
   top: calc(var(--navbar-height) + 2 * var(--navbar-padding));
-  left: calc(var(--sidebar-width) + 2 * var(--sidebar-padding));
-  width: calc(100% - (var(--sidebar-width) + 2 * var(--sidebar-padding) + 2 * var(--content-padding)));
+  left: 0;
+  width: calc(100% - (2 * var(--content-padding)));
   height: calc(100% - (var(--navbar-height) + 2 * var(--navbar-padding) + 2 * var(--content-padding)));
   display: grid;
   grid-template-columns: 1fr, 1fr;
