@@ -143,7 +143,6 @@
           <li>Position your face directly in front of the camera and align it in the centre of the frame.</li>
           <li>Have good lighting and a clear background.</li>
         </ul>
-        <div id="register-fail-message"></div>
         <img src="static\Animation--Fail.gif" alt="Fail Demo GIF">
         <button id="retry-btn">Retry</button>
       </div>
@@ -243,13 +242,10 @@
             });
         }
 
-      function showFailModal(message) {
+      function showFailModal() {
           const modal = document.getElementById('register-fail-modal');
           modal.style.display = 'block';
 
-          const registerFailMessage = document.getElementById('register-fail-message');
-          registerFailMessage.textContent = message;
-          
           const loginBtn = document.getElementById('retry-btn');
           loginBtn.addEventListener('click', function() {
               window.location.href = "/setup";
@@ -351,7 +347,7 @@
         } else {
           setTimeout(() => {
             processingPopup.style.display = "none";
-            showFailModal(data.message);
+            showFailModal();
           }, 4000);
         } 
       }
