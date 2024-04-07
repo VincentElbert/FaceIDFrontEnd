@@ -11,6 +11,7 @@ RUN pip install --user face_recognition
 
 COPY requirements.txt .
 RUN pip install --user -r requirements.txt
+RUN pip install pytz
 
 COPY resources resources
 COPY static static
