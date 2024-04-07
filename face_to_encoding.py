@@ -2,7 +2,7 @@ from PIL import Image
 import numpy as np
 import face_recognition
 import os
-UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'resources', 'image')
+
 def encodeSet(imgpath, txtpath):
     train_dir = os.listdir(imgpath)
     encodings = []  # Accumulate encodings in a list
@@ -22,7 +22,6 @@ def encodeSet(imgpath, txtpath):
 def encodeByPerson(imgpath):
     # Get the face encodings for the face in each image file
     img = Image.open(imgpath)
-    img.save(UPLOAD_FOLDER)
     img_arr = np.array(img)
     face_locations = face_recognition.face_locations(img_arr)
 
